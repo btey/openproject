@@ -1,0 +1,17 @@
+<div
+  class="op-merge-request-macro"
+  *ngIf="(mergeRequest$ | async) as mr; else loadingTemplate">
+  <op-gitlab-merge-request-state
+    class="op-merge-request-macro--state"
+    [small]="true"
+    [state]="mergeRequestState"
+  ></op-gitlab-merge-request-state>
+  <span [innerHTML]="displayText$ | async"></span>
+</div>
+<ng-template #loadingTemplate>
+  <op-content-loader
+    viewBox="0 0 200 5"
+  >
+    <svg:rect x="0" y="0" width="100%" height="5" rx="1" />
+  </op-content-loader>
+</ng-template>
