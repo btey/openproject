@@ -83,14 +83,20 @@ module OpenProject::GitlabIntegration
 
         return nil unless key
 
-        I18n.t("gitlab_integration.merge_request_#{key_action ? key_action : key}_comment",
-               :mr_number => payload.object_attributes.iid,
-               :mr_title => payload.object_attributes.title,
-               :mr_url => payload.object_attributes.url,
-               :repository => payload.repository.name,
-               :repository_url => payload.repository.url,
-               :gitlab_user => payload.user.name,
-               :gitlab_user_url => payload.user.avatar_url)
+        # I18n.t("gitlab_integration.merge_request_#{key_action ? key_action : key}_comment",
+        #        :mr_number => payload.object_attributes.iid,
+        #        :mr_title => payload.object_attributes.title,
+        #        :mr_url => payload.object_attributes.url,
+        #        :repository => payload.repository.name,
+        #        :repository_url => payload.repository.url,
+        #        :gitlab_user => payload.user.name,
+        #        :gitlab_user_url => payload.user.avatar_url)
+        angular_component_tag 'macro',
+               class: 'gitlab_merge_request',
+               inputs: {
+                 mergeRequestId: payload.object_attributes.iid,
+                 mergeRequestState: key_action ? key_action : key
+               }
       end
 
       def merge_request

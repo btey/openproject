@@ -27,7 +27,10 @@
 // See docs/COPYRIGHT.rdoc for more details.
 //++
 
-import { Injector, NgModule } from '@angular/core';
+import {
+  Injector,
+  NgModule,
+} from '@angular/core';
 import { OpSharedModule } from 'core-app/shared/shared.module';
 import { OpenprojectTabsModule } from 'core-app/shared/components/tabs/openproject-tabs.module';
 import { WorkPackageTabsService } from 'core-app/features/work-packages/components/wp-tabs/services/wp-tabs/wp-tabs.service';
@@ -38,19 +41,26 @@ import { TabHeaderComponent } from './tab-header/tab-header.component';
 import { TabMrsComponent } from './tab-mrs/tab-mrs.component';
 import { GitActionsMenuDirective } from './git-actions-menu/git-actions-menu.directive';
 import { GitActionsMenuComponent } from './git-actions-menu/git-actions-menu.component';
-import { WorkPackagesGitlabMrsService } from './tab-mrs/wp-gitlab-mrs.service';
 import { MergeRequestComponent } from './merge-request/merge-request.component';
 import { WorkPackageResource } from 'core-app/features/hal/resources/work-package-resource';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { GitlabMergeRequestResourceService } from './state/gitlab-merge-request.service';
+import {
+  gitlabMergeRequestMacroSelector,
+  MergeRequestMacroComponent,
+} from './merge-request/merge-request-macro.component';
+import { DynamicBootstrapper } from 'core-app/core/setup/globals/dynamic-bootstrapper';
+import { MergeRequestStateComponent } from './merge-request/merge-request-state.component';
+
 export function workPackageGitlabMrsCount(
   workPackage:WorkPackageResource,
   injector:Injector,
 ):Observable<number> {
-  const gitlabMrsService = injector.get(WorkPackagesGitlabMrsService);
+  const gitlabMrsService = injector.get(GitlabMergeRequestResourceService);
   return gitlabMrsService
-    .requireAndStream(workPackage)
+    .ofWorkPackage(workPackage)
     .pipe(
       map((mrs) => mrs.length),
     );
@@ -74,7 +84,7 @@ export function initializeGitlabIntegrationPlugin(injector:Injector) {
     OpenprojectTabsModule,
   ],
   providers: [
-    WorkPackagesGitlabMrsService,
+    GitlabMergeRequestResourceService,
   ],
   declarations: [
     GitlabTabComponent,
@@ -83,6 +93,8 @@ export function initializeGitlabIntegrationPlugin(injector:Injector) {
     GitActionsMenuDirective,
     GitActionsMenuComponent,
     MergeRequestComponent,
+    MergeRequestMacroComponent,
+    MergeRequestStateComponent,
   ],
   exports: [
     GitlabTabComponent,
@@ -90,10 +102,14 @@ export function initializeGitlabIntegrationPlugin(injector:Injector) {
     TabMrsComponent,
     GitActionsMenuDirective,
     GitActionsMenuComponent,
+    MergeRequestMacroComponent,
   ],
 })
 export class PluginModule {
   constructor(injector:Injector) {
     initializeGitlabIntegrationPlugin(injector);
+    DynamicBootstrapper.register(
+      { selector: gitlabMergeRequestMacroSelector, cls: MergeRequestMacroComponent, embeddable: true },
+    );
   }
 }

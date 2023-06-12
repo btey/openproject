@@ -55,9 +55,9 @@ import {
     ],
   })
   export class MergeRequestMacroComponent implements OnInit {
-    @Input() MergeRequestId:string;
+    @Input() mergeRequestId:string;
   
-    @Input() MergeRequestState:MergeRequestState;
+    @Input() mergeRequestState:MergeRequestState;
   
     mergeRequest$:Observable<IGitlabMergeRequest>;
   
@@ -84,14 +84,15 @@ import {
         );
     }
   
-    private buildText(pr:IGitlabMergeRequest):string {
+    private buildText(mr:IGitlabMergeRequest):string {
       const gitlabUserLink = this.htmlLink(mr._embedded.gitlabUser.htmlUrl, mr._embedded.gitlabUser.login);
-      const repositoryLink = this.htmlLink(mr.repositoryHtmlUrl, mr.repository);
+      const repositoryLink = this.htmlLink(mr.repository, mr.repository);
       const mrLink = this.htmlLink(mr.htmlUrl, mr.title);
   
-      const message = this.mergeRequestState === 'referenced' ? 'referenced_message' : 'message';
+      // const message = this.mergeRequestState === 'referenced' ? 'referenced_message' : 'message';
+
       return this.I18n.t(
-        `js.gitlab_integration.merge_requests.${message}`,
+        `js.gitlab_integration.merge_requests.message`,
         {
           mr_number: mr.number,
           mr_link: mrLink,

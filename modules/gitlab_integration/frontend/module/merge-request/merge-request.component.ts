@@ -27,24 +27,33 @@
 // See docs/COPYRIGHT.rdoc for more details.
 //++
 
-import { Component, Input } from '@angular/core';
-import { GitlabPipelineResource } from '../hal/resources/gitlab-pipelines-resource';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostBinding,
+  Input,
+} from '@angular/core';
 import { PathHelperService } from 'core-app/core/path-helper/path-helper.service';
 import { I18nService } from 'core-app/core/i18n/i18n.service';
-import {IGitlabMergeRequestResource} from 'core-app/features/plugins/linked/openproject-gitlab_integration/typings';
+import {
+  IGitlabPipelineResource,
+  IGitlabMergeRequest,
+} from 'core-app/features/plugins/linked/openproject-gitlab_integration/state/gitlab-merge-request.model';
 
 @Component({
-  selector: 'gitlab-merge-request',
+  selector: 'op-gitlab-merge-request',
   templateUrl: './merge-request.component.html',
   styleUrls: [
     './merge-request.component.sass',
     './mr-pipeline.component.sass',
   ],
-  host: { class: 'op-merge-request' }
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class MergeRequestComponent {
-  @Input() public mergeRequest:IGitlabMergeRequestResource;
+  @HostBinding('class.op-merge-request') className = true;
+
+  @Input() public mergeRequest:IGitlabMergeRequest;
 
   public text = {
     label_created_by: this.I18n.t('js.label_created_by'),
@@ -53,12 +62,13 @@ export class MergeRequestComponent {
     label_pipelines: this.I18n.t('js.gitlab_integration.gitlab_pipelines'),
   };
 
-  constructor(readonly PathHelper:PathHelperService,
-              readonly I18n:I18nService) {
+  constructor(
+    readonly PathHelper:PathHelperService,
+    readonly I18n:I18nService,
+  ) {
   }
 
-  get state() {
-
+  get state():string {
     if (this.mergeRequest.state === 'opened') {
       return (this.mergeRequest.draft ? 'open' : 'ready');
     } else {
@@ -66,18 +76,15 @@ export class MergeRequestComponent {
     }
   }
 
-  public pipelineStateText(pipeline:GitlabPipelineResource) {
-    /* Github apps can *optionally* add an output object (and a title) which is the most relevant information to display.
-       If that is not present, we can display the conclusion (which is present only on finished runs).
-       If that is not present, we can always fall back to the status. */
+  public pipelineStateText(pipeline:IGitlabPipelineResource) {
     return(pipeline.status);
   }
 
-  public pipelineState(pipeline:GitlabPipelineResource) {
+  public pipelineState(pipeline:IGitlabPipelineResource) {
     return(pipeline.status);
   }
 
-  public pipelineStateIcon(pipeline:GitlabPipelineResource) {
+  public pipelineStateIcon(pipeline:IGitlabPipelineResource) {
     switch (this.pipelineState(pipeline)) {
       case 'success': {
         return 'checkmark'

@@ -27,44 +27,81 @@
 // See docs/COPYRIGHT.rdoc for more details.
 //++
 
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
-import { WorkPackageResource } from "core-app/features/hal/resources/work-package-resource";
-import { HalResourceService } from "core-app/features/hal/services/hal-resource.service";
-import { CollectionResource } from "core-app/features/hal/resources/collection-resource";
-import { I18nService } from "core-app/core/i18n/i18n.service";
-import {IGitlabMergeRequestResource} from "core-app/features/plugins/linked/openproject-gitlab_integration/typings";
-import {ApiV3Service} from "core-app/core/apiv3/api-v3.service";
+import {
+  ChangeDetectionStrategy,
+  Component,
+  HostBinding,
+  Input,
+  OnInit,
+} from '@angular/core';
+import { WorkPackageResource } from 'core-app/features/hal/resources/work-package-resource';
+import { ApiV3Service } from 'core-app/core/apiv3/api-v3.service';
+import { I18nService } from 'core-app/core/i18n/i18n.service';
+import { GitlabMergeRequestResourceService } from 'core-app/features/plugins/linked/openproject-gitlab_integration/state/gitlab-merge-request.service';
+import { IGitlabMergeRequest } from 'core-app/features/plugins/linked/openproject-gitlab_integration/state/gitlab-merge-request.model';
+import {
+  map,
+  shareReplay,
+} from 'rxjs/operators';
+import { Observable } from 'rxjs';
+
+
+// import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+// import { WorkPackageResource } from "core-app/features/hal/resources/work-package-resource";
+// import { HalResourceService } from "core-app/features/hal/services/hal-resource.service";
+// import { CollectionResource } from "core-app/features/hal/resources/collection-resource";
+// import { I18nService } from "core-app/core/i18n/i18n.service";
+// import {IGitlabMergeRequestResource} from "core-app/features/plugins/linked/openproject-gitlab_integration/typings";
+// import {ApiV3Service} from "core-app/core/apiv3/api-v3.service";
 
 @Component({
-  selector: 'tab-mrs',
-  templateUrl: './tab-mrs.template.html',
-  host: { class: 'op-mrs' }
+  selector: 'tab-mrs', // op-tab-mrs
+  templateUrl: './tab-mrs.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TabMrsComponent implements OnInit {
-  @Input() public workPackage:WorkPackageResource;
+  @HostBinding('class.op-gitlab-mrs') className = true;
 
-  public mergeRequests:IGitlabMergeRequestResource[] = [];
+  @Input() workPackage:WorkPackageResource;
+
+  mergeRequests$:Observable<IGitlabMergeRequest[]>;
+  // mergeRequests:IGitlabMergeRequestResource[] = [];
+
+  emptyText:string;
 
   constructor(
     readonly I18n:I18nService,
     readonly apiV3Service:ApiV3Service,
-    readonly halResourceService:HalResourceService,
-    readonly changeDetector:ChangeDetectorRef,
+    // readonly halResourceService:HalResourceService,
+    // readonly changeDetector:ChangeDetectorRef,
+    readonly gitlabMergeRequests:GitlabMergeRequestResourceService,
   ) {}
 
-  ngOnInit(): void {
-    const basePath = this.apiV3Service.work_packages.id(this.workPackage.id as string).path;
-    const mergeRequestsPath = `${basePath}/gitlab_merge_requests`;
 
-    this.halResourceService
-      .get<CollectionResource<IGitlabMergeRequestResource>>(mergeRequestsPath)
-      .subscribe((value) => {
-        this.mergeRequests = value.elements;
-        this.changeDetector.detectChanges();
-      });
+  ngOnInit():void {
+    this.emptyText = this.I18n.t('js.gitlab_integration.tab_mrs.empty', { wp_id: this.workPackage.id });
+    this.mergeRequests$ = this
+      .gitlabMergeRequests
+      .ofWorkPackage(this.workPackage)
+      .pipe(
+        map((elements) => _.sortBy(elements, 'updatedAt')),
+        shareReplay(1),
+      );
   }
 
-  public getEmptyText() {
-    return this.I18n.t('js.gitlab_integration.tab_mrs.empty',{ wp_id: this.workPackage.id });
-  }
+  // ngOnInit(): void {
+  //   const basePath = this.apiV3Service.work_packages.id(this.workPackage.id as string).path;
+  //   const mergeRequestsPath = `${basePath}/gitlab_merge_requests`;
+
+  //   this.halResourceService
+  //     .get<CollectionResource<IGitlabMergeRequestResource>>(mergeRequestsPath)
+  //     .subscribe((value) => {
+  //       this.mergeRequests = value.elements;
+  //       this.changeDetector.detectChanges();
+  //     });
+  // }
+
+  // public getEmptyText() {
+  //   return this.I18n.t('js.gitlab_integration.tab_mrs.empty',{ wp_id: this.workPackage.id });
+  // }
 }
