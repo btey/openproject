@@ -28,17 +28,20 @@
 //++
 
 import copy from 'copy-text-to-clipboard';
-import { Component, Inject, Input } from '@angular/core';
+import {
+  Component,
+  Inject,
+  Input,
+} from '@angular/core';
 import { GitActionsService } from '../git-actions/git-actions.service';
-import { ISnippet } from "core-app/features/plugins/linked/openproject-gitlab_integration/typings";
 import { WorkPackageResource } from "core-app/features/hal/resources/work-package-resource";
 import { OPContextMenuComponent } from "core-app/shared/components/op-context-menu/op-context-menu.component";
 import {
   OpContextMenuLocalsMap,
-  OpContextMenuLocalsToken
+  OpContextMenuLocalsToken,
 } from "core-app/shared/components/op-context-menu/op-context-menu.types";
 import { I18nService } from "core-app/core/i18n/i18n.service";
-
+import { ISnippet } from 'core-app/features/plugins/linked/openproject-github_integration/state/github-pull-request.model';
 
 @Component({
   selector: 'op-git-actions-menu',
@@ -60,7 +63,9 @@ export class GitActionsMenuComponent extends OPContextMenuComponent {
   };
 
   public lastCopyResult:string = this.text.copyResult.success;
+
   public showCopyResult:boolean = false;
+  
   public copiedSnippetId:string = '';
 
   public snippets:ISnippet[] = [
@@ -81,12 +86,14 @@ export class GitActionsMenuComponent extends OPContextMenuComponent {
     },
   ];
 
-  constructor(@Inject(OpContextMenuLocalsToken)
-              public locals:OpContextMenuLocalsMap,
-              readonly I18n:I18nService,
-              readonly gitActions:GitActionsService) {
+  constructor(
+    @Inject(OpContextMenuLocalsToken)
+    public locals:OpContextMenuLocalsMap,
+    readonly I18n:I18nService,
+    readonly gitActions:GitActionsService,
+  ) {
     super(locals);
-    this.workPackage = this.locals.workPackage;
+    this.workPackage = this.locals.workPackage as WorkPackageResource;
   }
 
   public onCopyButtonClick(snippet:ISnippet):void {
