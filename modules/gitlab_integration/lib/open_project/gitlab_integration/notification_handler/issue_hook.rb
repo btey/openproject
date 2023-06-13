@@ -57,21 +57,21 @@ module OpenProject::GitlabIntegration
         }[payload.object_attributes.action]
 
         return nil unless accepted_actions.include? payload.object_attributes.action
-        # I18n.t("gitlab_integration.issue_#{key_action}_referenced_comment",
-        #   :issue_number => payload.object_attributes.iid,
-        #   :issue_title => payload.object_attributes.title,
-        #   :issue_url => payload.object_attributes.url,
-        #   :repository => payload.repository.name,
-        #   :repository_url => payload.repository.homepage,
-        #   :gitlab_user => payload.user.name,
-        #   :gitlab_user_url => payload.user.avatar_url)
+        I18n.t("gitlab_integration.issue_#{key_action}_referenced_comment",
+          :issue_number => payload.object_attributes.iid,
+          :issue_title => payload.object_attributes.title,
+          :issue_url => payload.object_attributes.url,
+          :repository => payload.repository.name,
+          :repository_url => payload.repository.homepage,
+          :gitlab_user => payload.user.name,
+          :gitlab_user_url => payload.user.avatar_url)
 
-        angular_component_tag 'macro',
-                              class: 'gitlab_merge_request',
-                              inputs: {
-                                mergeRequestId: payload.object_attributes.iid,
-                                mergeRequestState: key_action
-                              }
+        # angular_component_tag 'macro',
+        #                       class: 'gitlab_merge_request',
+        #                       inputs: {
+        #                         mergeRequestId: payload.object_attributes.iid,
+        #                         mergeRequestState: key_action
+        #                       }
 
       end
     end
