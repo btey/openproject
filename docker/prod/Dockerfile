@@ -88,27 +88,27 @@ CMD ["./docker/prod/web"]
 ENTRYPOINT ["./docker/prod/entrypoint-slim.sh"]
 VOLUME ["$APP_DATA_PATH"]
 
-# # -------------------------------------
-# # all-in-one (public)
-# # -------------------------------------
-# FROM base AS all-in-one
-#
-# ENV OPENPROJECT_RAILS__CACHE__STORE=memcache
-# ENV DATABASE_URL=postgres://openproject:openproject@127.0.0.1/openproject
-# ENV PGDATA=/var/openproject/pgdata
-# ENV GOSU_VERSION="1.17"
-#
-# RUN ./docker/prod/setup/postinstall-onprem.sh && \
-#   ln -s /app/docker/prod/setup/.irbrc /root/
-#
-# # Expose ports for apache and postgres
-# EXPOSE 80
-#
-# # Expose the postgres data directory and OpenProject data directory as volumes
-# VOLUME ["$PGDATA", "$APP_DATA_PATH"]
-#
-# # Set a custom entrypoint to allow for privilege dropping and one-off commands
-# ENTRYPOINT ["./docker/prod/entrypoint.sh"]
-#
-# # Set default command to launch the all-in-one configuration supervised by supervisord
-# CMD ["./docker/prod/supervisord"]
+# -------------------------------------
+# all-in-one (public)
+# -------------------------------------
+FROM base AS all-in-one
+
+ENV OPENPROJECT_RAILS__CACHE__STORE=memcache
+ENV DATABASE_URL=postgres://openproject:openproject@127.0.0.1/openproject
+ENV PGDATA=/var/openproject/pgdata
+ENV GOSU_VERSION="1.17"
+
+RUN ./docker/prod/setup/postinstall-onprem.sh && \
+  ln -s /app/docker/prod/setup/.irbrc /root/
+
+# Expose ports for apache and postgres
+EXPOSE 80
+
+# Expose the postgres data directory and OpenProject data directory as volumes
+VOLUME ["$PGDATA", "$APP_DATA_PATH"]
+
+# Set a custom entrypoint to allow for privilege dropping and one-off commands
+ENTRYPOINT ["./docker/prod/entrypoint.sh"]
+
+# Set default command to launch the all-in-one configuration supervised by supervisord
+CMD ["./docker/prod/supervisord"]
