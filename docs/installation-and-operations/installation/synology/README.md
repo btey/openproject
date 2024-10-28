@@ -5,7 +5,7 @@ sidebar_navigation: false
 # Synology
 
 Synology offers NAS devices that come with a UI for starting docker containers on them.
-This means OpenProject has to be used exactly as described in the [docker](../docker/) section.
+This means OpenProject has to be used exactly as described in the [docker](../docker/#one-container-per-process-recommended) section.
 
 ## Launching the container
 

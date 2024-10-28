@@ -8,7 +8,7 @@ ro:
     attributes:
       two_factor_authentication/device:
         identifier: "Identificator"
-        default: "Utilizează ca implicit"
+        default: "URL a paginii dorinței (lăsați gol pentru a utiliza setările implicite)"
       two_factor_authentication/device/sms:
         phone_number: "Număr de telefon"
     errors:

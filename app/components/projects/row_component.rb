@@ -293,8 +293,7 @@ module Projects
           scheme: :default,
           icon: :gear,
           label: I18n.t(:label_project_settings),
-          href: project_settings_general_path(project),
-          data: { turbo: false }
+          href: project_settings_general_path(project)
         }
       end
     end
