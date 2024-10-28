@@ -1,0 +1,79 @@
+default:
+  id_tokens:
+    VAULT_ID_TOKEN:
+      aud: https://git.bethelservice.org
+
+stages:
+  - build
+  - publish
+  - deploy_defaults
+  - deploy_dev
+  - deploy_prod
+
+.deploy-defaults:
+  stage: deploy_defaults
+  image: docker.packages.bethel.jw.org/glue-k8s-deploy@sha256:7d581b0e10bdb9b50352ab4ae01857fa6878af2aded6fbee0a15a63ca31247da
+  script:
+    - glue-k8s-deploy
+  variables:
+    KAPP_NAMESPACE: openproject
+    KUBECFG_KEEP_AUTH_CONFIG: "true"
+    SKIP_BUILD_IMAGES: "true"
+    AWS: null
+  tags: [linux-k8s-onprem]
+
+.dev-k8s:
+  extends: .deploy-defaults
+  variables:
+    TLS_HOST: mdprojects-dev.bethel.jw.org
+
+.prod-k8s:
+  extends: .deploy-defaults
+  variables:
+    TLS_HOST: mdprojects.bethel.jw.org
+
+build-image:
+  image: docker.packages.bethel.jw.org/glue-builder:latest
+  tags:
+    - linux-k8s
+  variables:
+    CONTEXT_PATH: .
+    BUILDER_COMMAND: build
+    DOCKERFILE_PATH: docker/prod/Dockerfile
+    IMAGE_NAME: openproject
+  script:
+    - export TAG="$CI_COMMIT_TAG"
+    - echo "Using tag $TAG"
+    - glue-buildah --verbosity 2 --tag "$TAG"
+  stage: build
+  only:
+    - tags
+
+openproject-deploy-dev:
+  extends: .dev-k8s
+  stage: deploy_dev
+  environment:
+    name: development
+    deployment_tier: development
+  variables:
+    GLUE_CMD: deploy
+    KUBECFG_VAULT_PATH: secret/systems/tanzu/tanzu-wkl-md-dev
+  before_script:
+    - rm -Rf docker/prod/Dockerfile
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+
+openproject-deploy-prod:
+  extends: .prod-k8s
+  stage: deploy_prod
+  environment:
+    name: Production
+    deployment_tier: production
+  when: manual
+  variables:
+    GLUE_CMD: deploy
+    KUBECFG_VAULT_PATH: secret/systems/tanzu/tanzu-wkl-md
+  before_script:
+    - rm -Rf docker/prod/Dockerfile
+  rules:
+    - if: $CI_COMMIT_BRANCH == "production"
