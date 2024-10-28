@@ -47,13 +47,7 @@ module WorkPackages
       end
 
       def export_format_url(format)
-        if @project.nil?
-          index_work_packages_path(format:)
-        elsif @query.id.present?
-          project_work_packages_path(project, query_id: @query.id, format:)
-        else
-          project_work_packages_path(project, format:)
-        end
+        @project.nil? ? index_work_packages_path(format:) : project_work_packages_path(project, format:)
       end
 
       def export_formats_settings

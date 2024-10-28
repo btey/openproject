@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) the OpenProject GmbH
@@ -40,7 +38,7 @@ class API::V3::Storages::StorageOpenAPI < API::OpenProjectAPI
                         .with_user(current_user)
 
       Storages::Peripherals::Registry
-        .resolve("#{@storage}.queries.open_storage")
+        .resolve("#{@storage.short_provider_type}.queries.open_storage")
         .call(storage: @storage, auth_strategy:)
         .match(
           on_success: ->(url) do

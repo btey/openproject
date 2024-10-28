@@ -1,7 +1,3 @@
-# frozen_string_literal: true
-
-#-- copyright
-# OpenProject is an open source project management software.
 # Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
@@ -28,7 +24,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-class Storages::OpenProjectStorageModalComponent::Body < ApplicationComponent
+class Storages::OpenProjectStorageModalComponent::Body < ApplicationComponent # rubocop:disable OpenProject/AddPreviewForViewComponent
   options success_title: I18n.t("storages.open_project_storage_modal.success.title"),
           success_subtitle: I18n.t("storages.open_project_storage_modal.success.subtitle"),
           waiting_title: I18n.t("storages.open_project_storage_modal.waiting.title"),

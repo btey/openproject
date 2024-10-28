@@ -46,7 +46,7 @@ class CustomActions::Actions::DoneRatio < CustomActions::Actions::Base
   end
 
   def self.all
-    if WorkPackage.work_based_mode?
+    if WorkPackage.use_field_for_done_ratio?
       super
     else
       []

@@ -44,7 +44,7 @@ module Projects::CustomFields
             multiple: true,
             dropdownPosition: "bottom",
             disabledProjects: projects_with_custom_field_mapping,
-            inputName: "#{input_name}[project_ids]"
+            inputName: "project_custom_field_project_mapping[project_ids]"
           }
         )
 
@@ -73,18 +73,10 @@ module Projects::CustomFields
     end
 
     def projects_with_custom_field_mapping
-      join_table
+      ProjectCustomFieldProjectMapping
         .where(custom_field_id: @project_mapping.custom_field_id)
         .pluck(:project_id)
         .to_h { |id| [id, id] }
-    end
-
-    def join_table
-      @project_mapping.class
-    end
-
-    def input_name
-      join_table.model_name.singular
     end
   end
 end

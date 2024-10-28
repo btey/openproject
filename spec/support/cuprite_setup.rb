@@ -53,6 +53,15 @@ module WindowResolutionManagement
   end
 end
 
+# Customize browser download path until https://github.com/rubycdp/cuprite/pull/217 is released.
+module SetCupriteDownloadPath
+  def initialize(app, options = {})
+    super
+    @options[:save_path] = DownloadList::SHARED_PATH.to_s
+  end
+end
+Capybara::Cuprite::Driver.prepend(SetCupriteDownloadPath)
+
 def register_better_cuprite(language, name: :"better_cuprite_#{language}")
   Capybara.register_driver(name) do |app|
     options = {
@@ -62,7 +71,6 @@ def register_better_cuprite(language, name: :"better_cuprite_#{language}")
       # pending_connection_errors: false,
       inspector: true,
       headless: headless_mode?,
-      save_path: DownloadList::SHARED_PATH.to_s,
       window_size: [1920, 1080]
     }
 
@@ -84,7 +92,6 @@ def register_better_cuprite(language, name: :"better_cuprite_#{language}")
       "disable-gpu": nil,
       "disable-popup-blocking": nil,
       lang: language,
-      "accept-lang": language,
       "no-sandbox": nil,
       "disable-smooth-scrolling": true
     }

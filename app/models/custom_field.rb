@@ -69,9 +69,6 @@ class CustomField < ApplicationRecord
   validates :min_length, numericality: { less_than_or_equal_to: :max_length, message: :smaller_than_or_equal_to_max_length },
                          unless: Proc.new { |cf| cf.max_length.blank? }
 
-  validates :multi_value, absence: true, unless: :multi_value_possible?
-  validates :allow_non_open_versions, absence: true, unless: :allow_non_open_versions_possible?
-
   before_validation :check_searchability
   after_destroy :destroy_help_text
 
@@ -268,10 +265,6 @@ class CustomField < ApplicationRecord
     field_format == "list"
   end
 
-  def user?
-    field_format == "user"
-  end
-
   def version?
     field_format == "version"
   end
@@ -284,12 +277,22 @@ class CustomField < ApplicationRecord
     field_format == "bool"
   end
 
+  def multi_value?
+    multi_value
+  end
+
   def multi_value_possible?
-    version? || user? || list?
+    %w[version user list].include?(field_format) &&
+      [ProjectCustomField, WorkPackageCustomField, TimeEntryCustomField, VersionCustomField].include?(self.class)
+  end
+
+  def allow_non_open_versions?
+    allow_non_open_versions
   end
 
   def allow_non_open_versions_possible?
-    version?
+    version? &&
+      [ProjectCustomField, WorkPackageCustomField, TimeEntryCustomField, VersionCustomField].include?(self.class)
   end
 
   ##

@@ -72,7 +72,7 @@ module OpenProject::GithubIntegration
                    },
                    permissible_on: :global,
                    require: :loggedin,
-                   visible: -> { OpenProject::FeatureDecisions.deploy_targets_active? }
+                   enabled: -> { OpenProject::FeatureDecisions.deploy_targets_active? } # can only be enable at start-time
       end
 
       menu :work_package_split_view,

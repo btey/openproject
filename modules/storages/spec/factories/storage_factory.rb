@@ -95,7 +95,7 @@ FactoryBot.define do
     trait :as_automatically_managed do
       automatic_management_enabled { true }
       username { "OpenProject" }
-      password { ENV.fetch("NEXTCLOUD_LOCAL_GROUP_USER_PASSWORD", "Password123") }
+      password { "Password123" }
     end
   end
 

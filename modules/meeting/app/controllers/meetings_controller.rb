@@ -50,6 +50,7 @@ class MeetingsController < ApplicationController
 
   include OpTurbo::ComponentStream
   include OpTurbo::FlashStreamHelper
+  include ApplicationComponentStreams
   include Meetings::AgendaComponentStreams
   include MetaTagsHelper
 
@@ -78,7 +79,7 @@ class MeetingsController < ApplicationController
     if params[:reference] == @meeting.changed_hash
       head :no_content
     else
-      respond_with_flash(Meetings::UpdateFlashComponent.new(@meeting))
+      respond_with_flash(Meetings::UpdateFlashComponent.new(meeting: @meeting))
     end
   end
 

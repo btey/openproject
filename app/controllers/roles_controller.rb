@@ -97,7 +97,7 @@ class RolesController < ApplicationController
 
   def report
     @roles = roles_scope
-    @permissions = visible_permissions
+    @permissions = OpenProject::AccessControl.permissions.reject(&:public?)
   end
 
   def bulk_update
@@ -110,7 +110,7 @@ class RolesController < ApplicationController
       redirect_to action: "index"
     else
       @calls = calls
-      @permissions = visible_permissions
+      @permissions = OpenProject::AccessControl.permissions.reject(&:public?)
       render action: "report"
     end
   end
@@ -137,12 +137,6 @@ class RolesController < ApplicationController
 
       update_role(role, new_permissions)
     end
-  end
-
-  def visible_permissions
-    OpenProject::AccessControl.permissions
-                              .reject(&:public?)
-                              .filter(&:visible?)
   end
 
   def roles_scope

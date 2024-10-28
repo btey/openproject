@@ -29,11 +29,30 @@
 module Settings
   module ProjectCustomFields
     module ProjectCustomFieldMapping
-      class NewProjectMappingFormComponent < Admin::CustomFields::CustomFieldProjects::NewCustomFieldProjectsFormModalComponent
+      class NewProjectMappingFormComponent < ApplicationComponent # rubocop:disable OpenProject/AddPreviewForViewComponent
+        include OpTurbo::Streamable
+
+        DIALOG_ID = "settings--new-project-custom-field-mapping-component".freeze
+        DIALOG_BODY_ID = "settings--new-project-custom-field-mapping-body-component".freeze
+
+        def initialize(project_mapping:, project_custom_field:)
+          super
+          @project_mapping = project_mapping
+          @project_custom_field = project_custom_field
+        end
+
         private
 
-        def url
-          url_helpers.link_admin_settings_project_custom_field_path(@custom_field)
+        def title
+          I18n.t(:label_add_projects)
+        end
+
+        def cancel_button_text
+          I18n.t("button_cancel")
+        end
+
+        def submit_button_text
+          I18n.t("button_add")
         end
       end
     end

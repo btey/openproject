@@ -27,7 +27,8 @@ RSpec.describe XlsExport::Project::Exporter::XLS do
 
   it "performs a successful export" do
     expect(rows.count).to eq(1)
-    expect(sheet.row(1)).to eq [project.name, project.description, "Off track", "false"]
+    expect(sheet.row(1)).to eq [project.id.to_s, project.identifier,
+                                project.name, project.description, "Off track", "false"]
   end
 
   context "with project description containing html" do
@@ -37,7 +38,8 @@ RSpec.describe XlsExport::Project::Exporter::XLS do
 
     it "performs a successful export" do
       expect(rows.count).to eq(1)
-      expect(sheet.row(1)).to eq [project.name, "This is an html description.", "Off track", "false"]
+      expect(sheet.row(1)).to eq [project.id.to_s, project.identifier, project.name,
+                                  "This is an html description.", "Off track", "false"]
     end
   end
 
@@ -46,18 +48,9 @@ RSpec.describe XlsExport::Project::Exporter::XLS do
 
     it "performs a successful export" do
       expect(rows.count).to eq(1)
-      expect(sheet.row(1)).to eq [project.name, project.description,
+      expect(sheet.row(1)).to eq [project.id.to_s, project.identifier,
+                                  project.name, project.description,
                                   "Off track", project.status_explanation, "false"]
-    end
-  end
-
-  context "with id and identifier enabled" do
-    let(:query_columns) { %w[name description project_status public id identifier] }
-
-    it "performs a successful export" do
-      expect(rows.count).to eq(1)
-      expect(sheet.row(1)).to eq [project.name, project.description, "Off track",
-                                  "false", project.id.to_s, project.identifier]
     end
   end
 
@@ -73,7 +66,7 @@ RSpec.describe XlsExport::Project::Exporter::XLS do
 
       it "renders all those columns" do
         cf_names = global_project_custom_fields.map(&:name)
-        expect(header).to eq ["Name", "Description", "Status", "Public", *cf_names]
+        expect(header).to eq ["ID", "Identifier", "Name", "Description", "Status", "Public", *cf_names]
 
         expect(header).to include not_used_string_cf.name
         expect(header).to include hidden_cf.name
@@ -92,7 +85,8 @@ RSpec.describe XlsExport::Project::Exporter::XLS do
         end
 
         expect(sheet.row(1))
-          .to eq [project.name, project.description, "Off track", "false", *custom_values]
+          .to eq [project.id.to_s, project.identifier, project.name, project.description, "Off track", "false",
+                  *custom_values]
 
         # The column for the project-level-disabled custom field is blank
         expect(sheet.row(1)[header.index(not_used_string_cf.name)]).to be_nil
@@ -103,7 +97,7 @@ RSpec.describe XlsExport::Project::Exporter::XLS do
       it "renders available project custom fields in the header if enabled in any project" do
         cf_names = global_project_custom_fields.map(&:name)
 
-        expect(header).to eq ["Name", "Description", "Status", "Public", *cf_names]
+        expect(header).to eq ["ID", "Identifier", "Name", "Description", "Status", "Public", *cf_names]
 
         expect(header).not_to include not_used_string_cf.name
         expect(header).not_to include hidden_cf.name
@@ -122,7 +116,8 @@ RSpec.describe XlsExport::Project::Exporter::XLS do
         end
 
         expect(sheet.row(1))
-          .to eq [project.name, project.description, "Off track", "false", *custom_values]
+          .to eq [project.id.to_s, project.identifier, project.name, project.description, "Off track", "false",
+                  *custom_values]
       end
     end
 
@@ -130,10 +125,10 @@ RSpec.describe XlsExport::Project::Exporter::XLS do
       let(:permissions) { %i(view_projects) }
 
       it "does not render project custom fields in the header" do
-        expect(header).to eq %w[Name Description Status Public]
+        expect(header).to eq ["ID", "Identifier", "Name", "Description", "Status", "Public"]
 
         expect(sheet.row(1))
-          .to eq [project.name, project.description, "Off track", "false"]
+          .to eq [project.id.to_s, project.identifier, project.name, project.description, "Off track", "false"]
       end
     end
   end

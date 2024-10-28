@@ -32,12 +32,39 @@ module SettingsHelper
   extend self
   include OpenProject::FormTagHelper
 
-  def setting_select(setting, choices, options = {})
-    blank_text = options.delete(:blank)
+  def system_settings_tabs
+    [
+      {
+        name: "general",
+        controller: "/admin/settings/general_settings",
+        label: :label_general
+      },
+      {
+        name: "languages",
+        controller: "/admin/settings/languages_settings",
+        label: :label_languages
+      },
+      {
+        name: "projects",
+        controller: "/admin/settings/projects_settings",
+        label: :label_project_plural
+      },
+      {
+        name: "repositories",
+        controller: "/admin/settings/repositories_settings",
+        label: :label_repository_plural
+      },
+      {
+        name: "experimental",
+        controller: "/admin/settings/experimental_settings",
+        label: :label_experimental
+      }
+    ]
+  end
 
-    if blank_text
-      translated_blank = blank_text.is_a?(Symbol) ? I18n.t(blank_text) : blank_text
-      choices.unshift([translated_blank, ""])
+  def setting_select(setting, choices, options = {})
+    if blank_text = options.delete(:blank)
+      choices = [[blank_text.is_a?(Symbol) ? I18n.t(blank_text) : blank_text, ""]] + choices
     end
 
     setting_label(setting, options) +

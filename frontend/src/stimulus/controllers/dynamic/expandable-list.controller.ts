@@ -31,17 +31,14 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class ExxpandableListController extends Controller {
-  static targets = ['hiddenElements', 'showButton'];
+  static targets = ['showHideButton', 'hiddenElements'];
   declare readonly hiddenElementsTarget:HTMLElement;
-  declare readonly showButtonTarget:HTMLElement;
 
-  showElements():void {
-    this.hiddenElementsTarget.classList.remove('d-none');
-    this.showButtonTarget.classList.add('d-none');
-  }
-
-  hideElements():void {
-    this.hiddenElementsTarget.classList.add('d-none');
-    this.showButtonTarget.classList.remove('d-none');
+  showhiddenElements():void {
+    if (this.hiddenElementsTarget.classList.contains('d-none')) {
+      this.hiddenElementsTarget.classList.remove('d-none');
+    } else {
+      this.hiddenElementsTarget.classList.add('d-none');
+    }
   }
 }

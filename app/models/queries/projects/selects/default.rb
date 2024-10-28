@@ -1,4 +1,4 @@
-#-- copyright
+# -- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) the OpenProject GmbH
 #
@@ -27,10 +27,10 @@
 # ++
 
 class Queries::Projects::Selects::Default < Queries::Selects::Base
-  KEYS = %i[id identifier status_explanation hierarchy name public description].freeze
+  KEYS = %i[status_explanation hierarchy name public description].freeze
 
   def self.key
-    /\A(#{Regexp.union(KEYS.map(&:to_s))})\z/
+    Regexp.new(KEYS.join("|"))
   end
 
   def self.all_available

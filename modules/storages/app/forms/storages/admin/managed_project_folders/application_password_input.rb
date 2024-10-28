@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) the OpenProject GmbH
@@ -60,7 +58,7 @@ module Storages::Admin::ManagedProjectFolders
           href: Storages::UrlBuilder.url(@storage.uri, "settings/admin/openproject"),
           target: "_blank"
         )
-      ) { I18n.t("storages.instructions.#{@storage}.integration") }
+      ) { I18n.t("storages.instructions.#{@storage.short_provider_type}.integration") }
     end
   end
 end

@@ -43,7 +43,8 @@ RSpec.describe Projects::Exports::CSV, "integration" do
 
   it "performs a successful export" do
     expect(parsed.size).to eq(2)
-    expect(parsed.last).to eq [project.name, project.description, "Off track", "false"]
+    expect(parsed.last).to eq [project.id.to_s, project.identifier,
+                               project.name, project.description, "Off track", "false"]
   end
 
   context "with status_explanation enabled" do
@@ -51,18 +52,9 @@ RSpec.describe Projects::Exports::CSV, "integration" do
 
     it "performs a successful export" do
       expect(parsed.size).to eq(2)
-      expect(parsed.last).to eq [project.name, project.description,
+      expect(parsed.last).to eq [project.id.to_s, project.identifier,
+                                 project.name, project.description,
                                  "Off track", "some explanation", "false"]
-    end
-  end
-
-  context "with id and identifier selected" do
-    let(:query_columns) { %w[name description id identifier project_status public] }
-
-    it "performs a successful export" do
-      expect(parsed.size).to eq(2)
-      expect(parsed.last).to eq [project.name, project.description, project.id.to_s,
-                                 project.identifier, "Off track", "false"]
     end
   end
 
@@ -82,12 +74,13 @@ RSpec.describe Projects::Exports::CSV, "integration" do
       it "does not render project custom fields in the header" do
         expect(parsed.size).to eq 2
 
-        expect(header).to eq ["\xEF\xBB\xBFName", "Description", "Status", "Public"]
+        expect(header).to eq ["id", "Identifier", "Name", "Description", "Status", "Public"]
       end
 
       it "does not render the custom field values in the rows if enabled for a project" do
         expect(rows.first)
-          .to eq [project.name, project.description, "Off track", "false"]
+          .to eq [project.id.to_s, project.identifier, project.name,
+                  project.description, "Off track", "false"]
       end
     end
 
@@ -100,7 +93,7 @@ RSpec.describe Projects::Exports::CSV, "integration" do
         expect(cf_names).not_to include(not_used_string_cf.name)
         expect(cf_names).not_to include(hidden_cf.name)
 
-        expect(header).to eq ["\xEF\xBB\xBFName", "Description", "Status", "Public", *cf_names]
+        expect(header).to eq ["id", "Identifier", "Name", "Description", "Status", "Public", *cf_names]
       end
 
       it "renders the custom field values in the rows if enabled for a project" do
@@ -117,7 +110,8 @@ RSpec.describe Projects::Exports::CSV, "integration" do
           end
         end
         expect(rows.first)
-          .to eq [project.name, project.description, "Off track", "false", *custom_values]
+          .to eq [project.id.to_s, project.identifier, project.name,
+                  project.description, "Off track", "false", *custom_values]
       end
     end
 
@@ -132,7 +126,7 @@ RSpec.describe Projects::Exports::CSV, "integration" do
         expect(cf_names).to include(not_used_string_cf.name)
         expect(cf_names).to include(hidden_cf.name)
 
-        expect(header).to eq ["\xEF\xBB\xBFName", "Description", "Status", "Public", *cf_names]
+        expect(header).to eq ["id", "Identifier", "Name", "Description", "Status", "Public", *cf_names]
       end
 
       it "renders the custom field values in the rows if enabled for a project" do
@@ -151,7 +145,8 @@ RSpec.describe Projects::Exports::CSV, "integration" do
           end
         end
         expect(rows.first)
-          .to eq [project.name, project.description, "Off track", "false", *custom_values]
+          .to eq [project.id.to_s, project.identifier, project.name,
+                  project.description, "Off track", "false", *custom_values]
       end
     end
   end

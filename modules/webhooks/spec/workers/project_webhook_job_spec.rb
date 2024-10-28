@@ -29,6 +29,7 @@
 require "spec_helper"
 
 RSpec.describe ProjectWebhookJob, :webmock, type: :job do
+  shared_let(:user) { create(:admin) }
   shared_let(:request_url) { "http://example.net/test/42" }
   shared_let(:project) { create(:project, name: "Foo Bar") }
   shared_let(:webhook) { create(:webhook, all_projects: true, url: request_url, secret: nil) }
@@ -49,10 +50,6 @@ RSpec.describe ProjectWebhookJob, :webmock, type: :job do
       { content_type: "text/plain", x_spec: "foobar" }
     end
 
-    let(:expected_payload) do
-      {}
-    end
-
     let(:stub) do
       stub_request(:post, stubbed_url.sub("http://", ""))
         .with(
@@ -60,8 +57,7 @@ RSpec.describe ProjectWebhookJob, :webmock, type: :job do
             "action" => event,
             "project" => hash_including(
               "_type" => "Project",
-              "name" => "Foo Bar",
-              **expected_payload
+              "name" => "Foo Bar"
             )
           ),
           headers: request_headers
@@ -82,6 +78,7 @@ RSpec.describe ProjectWebhookJob, :webmock, type: :job do
 
     before do
       allow(Webhooks::Webhook).to receive(:find).with(webhook.id).and_return(webhook)
+      login_as user
       stub
     end
 
@@ -136,7 +133,7 @@ RSpec.describe ProjectWebhookJob, :webmock, type: :job do
     end
   end
 
-  describe "triggering a project creation" do
+  describe "triggering a projec creation" do
     it_behaves_like "a project webhook call" do
       let(:event) { "project:created" }
     end
@@ -147,32 +144,6 @@ RSpec.describe ProjectWebhookJob, :webmock, type: :job do
       let(:event) { "project:update" }
       let(:response_code) { 404 }
       let(:response_body) { "not found" }
-    end
-  end
-
-  describe "triggering an update with a custom field set" do
-    shared_let(:custom_field) { create(:project_custom_field, :string, projects: [project]) }
-    shared_let(:custom_value) do
-      create(:custom_value,
-             custom_field:,
-             customized: project,
-             value: "wat")
-    end
-
-    it_behaves_like "a project webhook call" do
-      let(:expected_payload) do
-        { custom_field.attribute_name(:camel_case) => "wat" }
-      end
-
-      it "includes the custom field value" do
-        subject
-
-        expect(stub).to have_been_requested
-
-        log = Webhooks::Log.last
-        request = JSON.parse(log.request_body)
-        expect(request["project"][custom_field.attribute_name(:camel_case)]).to eq "wat"
-      end
     end
   end
 end

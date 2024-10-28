@@ -436,7 +436,7 @@ RSpec.describe RolesController do
 
     it "assigns permissions" do
       expect(assigns(:permissions))
-        .to match OpenProject::AccessControl.permissions.reject(&:public?).reject(&:hidden?)
+        .to match OpenProject::AccessControl.permissions.reject(&:public?)
     end
 
     it "assigns roles" do

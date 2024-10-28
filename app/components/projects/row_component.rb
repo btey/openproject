@@ -30,7 +30,6 @@
 module Projects
   class RowComponent < ::RowComponent
     delegate :favored_project_ids, to: :table
-    delegate :identifier, to: :project
 
     def project
       model.first
@@ -54,7 +53,7 @@ module Projects
                tag: :a,
                tooltip_direction: :e,
                href: helpers.build_favorite_path(project, format: :html),
-               data: { "turbo-method": currently_favored? ? :delete : :post },
+               data: { method: currently_favored? ? :delete : :post },
                classes: currently_favored? ? "op-primer--star-icon " : "op-project-row-component--favorite",
                label: currently_favored? ? I18n.t(:button_unfavorite) : I18n.t(:button_favorite),
                aria: { label: currently_favored? ? I18n.t(:button_unfavorite) : I18n.t(:button_favorite) },
@@ -106,10 +105,6 @@ module Projects
       return "" unless project.required_disk_space.to_i > 0
 
       number_to_human_size(project.required_disk_space, precision: 2)
-    end
-
-    def id
-      project.id.to_s
     end
 
     def name
@@ -259,7 +254,7 @@ module Projects
         scheme: :default,
         icon: "star",
         href: helpers.build_favorite_path(project, format: :html),
-        data: { "turbo-method": :post },
+        data: { method: :post },
         label: I18n.t(:button_favorite),
         aria: { label: I18n.t(:button_favorite) }
       }
@@ -273,7 +268,7 @@ module Projects
         icon: "star-fill",
         size: :medium,
         href: helpers.build_favorite_path(project, format: :html),
-        data: { "turbo-method": :delete },
+        data: { method: :delete },
         classes: "op-primer--star-icon",
         label: I18n.t(:button_unfavorite),
         aria: { label: I18n.t(:button_unfavorite) }
@@ -360,8 +355,7 @@ module Projects
           scheme: :danger,
           icon: :trash,
           label: I18n.t(:button_delete),
-          href: confirm_destroy_project_path(project),
-          data: { turbo: false }
+          href: confirm_destroy_project_path(project)
         }
       end
     end
@@ -372,10 +366,6 @@ module Projects
 
     def custom_field_column?(column)
       column.is_a?(::Queries::Projects::Selects::CustomField)
-    end
-
-    def current_page
-      table.model.current_page.to_s
     end
   end
 end

@@ -29,8 +29,9 @@ module WorkPackages
   class Menu < Submenu
     attr_reader :view_type, :project, :params
 
-    def initialize(project: nil, params: nil)
+    def initialize(project: nil, params: nil, request: nil)
       @view_type = "work_packages_table"
+      @request = request
 
       super(view_type:, project:, params:)
     end
@@ -60,15 +61,14 @@ module WorkPackages
 
     def selected?(query_params)
       return true if check_for_redirected_urls(query_params)
-      return true if highlight_on_work_packages?(query_params)
+
+      if query_params[:work_package_default] &&
+        (%i[filters query_props query_id name].none? { |k| params.key? k }) &&
+        @request.referer.include?("work_packages")
+        return true
+      end
 
       super
-    end
-
-    def highlight_on_work_packages?(query_params)
-      query_params[:work_package_default] &&
-        (%i[filters query_props query_id name].none? { |k| params.key? k }) &&
-        params[:on_work_package_path] == "true"
     end
 
     def check_for_redirected_urls(query_params)

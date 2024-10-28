@@ -132,8 +132,6 @@ RSpec.describe ProjectQuery do
       it "lists registered selects" do
         expect(instance.available_selects.map(&:attribute))
           .to match_array(%i[
-                            id
-                            identifier
                             name
                             favored
                             public
@@ -153,8 +151,6 @@ RSpec.describe ProjectQuery do
       it "includes admin columns" do
         expect(instance.available_selects.map(&:attribute))
           .to match_array(%i[
-                            id
-                            identifier
                             name
                             favored
                             public

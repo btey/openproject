@@ -61,9 +61,12 @@
     background: #fff
     transition: background .3s
 
-  #wrapper:not(.hidden-navigation)
+  #main:not(.nosidebar)
     .content-overlay
       display: block
+
+  #wrapper:not(.hidden-navigation)
+    .content-overlay
       position: fixed
       height: 100%
       background: #000

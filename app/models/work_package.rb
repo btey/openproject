@@ -45,7 +45,6 @@ class WorkPackage < ApplicationRecord
   include OpenProject::Journal::AttachmentHelper
 
   DONE_RATIO_OPTIONS = %w[field status].freeze
-  TOTAL_PERCENT_COMPLETE_MODE_OPTIONS = %w[work_weighted_average simple_average].freeze
 
   belongs_to :project
   belongs_to :type
@@ -213,8 +212,12 @@ class WorkPackage < ApplicationRecord
     Setting.work_package_done_ratio == "field"
   end
 
-  def self.complete_on_status_closed?
-    Setting.percent_complete_on_status_closed == "set_100p"
+  def self.use_status_for_done_ratio?
+    Setting.work_package_done_ratio == "status"
+  end
+
+  def self.use_field_for_done_ratio?
+    Setting.work_package_done_ratio == "field"
   end
 
   # Returns true if usr or current user is allowed to view the work_package
@@ -302,7 +305,7 @@ class WorkPackage < ApplicationRecord
   end
 
   def done_ratio
-    if WorkPackage.status_based_mode? && status && status.default_done_ratio
+    if WorkPackage.use_status_for_done_ratio? && status && status.default_done_ratio
       status.default_done_ratio
     else
       read_attribute(:done_ratio)
@@ -329,12 +332,12 @@ class WorkPackage < ApplicationRecord
     write_attribute :done_ratio, convert_value_to_percentage(value)
   end
 
-  def set_derived_progress_hint(field_name, hint, **params)
-    derived_progress_hints[field_name] = ProgressHint.new("#{field_name}.#{hint}", params)
+  def derived_progress_hints=(hints)
+    @derived_progress_hints = hints
   end
 
-  def derived_progress_hint(field_name)
-    derived_progress_hints[field_name]
+  def derived_progress_hints
+    @derived_progress_hints ||= {}
   end
 
   def duration_in_hours
@@ -377,7 +380,7 @@ class WorkPackage < ApplicationRecord
   # Set the done_ratio using the status if that setting is set.  This will keep the done_ratios
   # even if the user turns off the setting later
   def update_done_ratio_from_status
-    if WorkPackage.status_based_mode? && status && status.default_done_ratio
+    if WorkPackage.use_status_for_done_ratio? && status && status.default_done_ratio
       self.done_ratio = status.default_done_ratio
     end
   end
@@ -549,10 +552,6 @@ class WorkPackage < ApplicationRecord
   end
 
   private
-
-  def derived_progress_hints
-    @derived_progress_hints ||= {}
-  end
 
   def add_time_entry_for(user, attributes)
     return if time_entry_blank?(attributes)

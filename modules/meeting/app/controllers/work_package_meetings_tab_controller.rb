@@ -52,7 +52,7 @@ class WorkPackageMeetingsTabController < ApplicationController
   end
 
   def count
-    count = Meeting.visible.where(id: @work_package.meetings.select(:id)).count
+    count = get_grouped_agenda_items(:upcoming).count
     render json: { count: }
   end
 

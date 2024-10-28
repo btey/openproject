@@ -300,15 +300,15 @@ Redmine::MenuManager.map :admin_menu do |menu|
             parent: :users_and_permissions
 
   menu.push :admin_work_packages,
-            { controller: "/admin/settings/work_packages_general", action: :show },
+            { controller: "/admin/settings/work_packages_settings", action: :show },
             if: Proc.new { User.current.admin? },
             caption: :label_work_package_plural,
             icon: "op-view-list"
 
-  menu.push :work_packages_general,
-            { controller: "/admin/settings/work_packages_general", action: :show },
+  menu.push :work_packages_setting,
+            { controller: "/admin/settings/work_packages_settings", action: :show },
             if: Proc.new { User.current.admin? },
-            caption: :label_general,
+            caption: :label_work_packages_settings,
             parent: :admin_work_packages
 
   menu.push :types,
@@ -321,13 +321,8 @@ Redmine::MenuManager.map :admin_menu do |menu|
             { controller: "/statuses" },
             if: Proc.new { User.current.admin? },
             caption: :label_status,
-            parent: :admin_work_packages
-
-  menu.push :progress_tracking,
-            { controller: "/admin/settings/progress_tracking", action: :show },
-            if: Proc.new { User.current.admin? },
-            caption: :label_progress_tracking,
-            parent: :admin_work_packages
+            parent: :admin_work_packages,
+            html: { class: "statuses" }
 
   menu.push :workflows,
             { controller: "/workflows", action: "edit" },
@@ -414,29 +409,13 @@ Redmine::MenuManager.map :admin_menu do |menu|
             caption: :label_system_settings,
             icon: "gear"
 
-  menu.push :settings_general,
-            { controller: "/admin/settings/general_settings", action: :show },
-            if: Proc.new { User.current.admin? },
-            caption: :label_general,
-            parent: :settings
-
-  menu.push :settings_languages,
-            { controller: "/admin/settings/languages_settings", action: :show },
-            if: Proc.new { User.current.admin? },
-            caption: :label_languages,
-            parent: :settings
-
-  menu.push :settings_repositories,
-            { controller: "/admin/settings/repositories_settings", action: :show },
-            if: Proc.new { User.current.admin? },
-            caption: :label_repository_plural,
-            parent: :settings
-
-  menu.push :settings_experimental,
-            { controller: "/admin/settings/experimental_settings", action: :show },
-            if: Proc.new { User.current.admin? && Rails.env.development? },
-            caption: :label_experimental,
-            parent: :settings
+  SettingsHelper.system_settings_tabs.each do |node|
+    menu.push :"settings_#{node[:name]}",
+              { controller: node[:controller], action: :show },
+              caption: node[:label],
+              if: Proc.new { User.current.admin? && (node[:name] != "experimental" || Rails.env.development?) },
+              parent: :settings
+  end
 
   menu.push :mail_and_notifications,
             { controller: "/admin/settings/aggregation_settings", action: :show },

@@ -8,7 +8,7 @@ nl:
       create_title: 'Maak een nieuwe teamplanner'
       unsaved_title: 'Naamloze teamplanner'
       no_data: 'Voeg taakontvangers toe om uw team planner op te zetten.'
-      add_assignee: 'Assignee'
+      add_assignee: 'Voeg verantwoordelijke toe'
       remove_assignee: 'Verwijder verantwoordelijke'
       two_weeks: '2-week'
       one_week: '1-week'

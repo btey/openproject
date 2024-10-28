@@ -33,8 +33,8 @@ module Storages
     module StorageInteraction
       module Nextcloud
         class FilePathToIdMapQuery
-          def self.call(storage:, auth_strategy:, folder:, depth: Float::INFINITY)
-            new(storage).call(auth_strategy:, folder:, depth:)
+          def self.call(storage:, auth_strategy:, folder:)
+            new(storage).call(auth_strategy:, folder:)
           end
 
           def initialize(storage)
@@ -42,15 +42,16 @@ module Storages
             @propfind_query = Internal::PropfindQuery.new(storage)
           end
 
-          def call(auth_strategy:, folder:, depth:)
+          def call(auth_strategy:, folder:)
             origin_user_id = Util.origin_user_id(caller: self.class, storage: @storage, auth_strategy:)
-                                 .on_failure { return _1 }
-                                 .result
+                                 .on_failure do |result|
+              return result
+            end
 
-            Authentication[auth_strategy].call(storage: @storage, http_options: headers(depth)) do |http|
+            Authentication[auth_strategy].call(storage: @storage, http_options:) do |http|
               # nc:acl-list is only required to avoid https://community.openproject.org/wp/49628. See comment #4.
               @propfind_query.call(http:,
-                                   username: origin_user_id,
+                                   username: origin_user_id.result,
                                    path: folder.path,
                                    props: %w[oc:fileid nc:acl-list])
                              .map do |obj|
@@ -61,8 +62,8 @@ module Storages
 
           private
 
-          def headers(depth)
-            Util.webdav_request_with_depth(depth.to_s.downcase)
+          def http_options
+            Util.webdav_request_with_depth("infinity")
           end
         end
       end

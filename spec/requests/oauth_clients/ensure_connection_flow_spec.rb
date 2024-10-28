@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) the OpenProject GmbH
@@ -38,7 +36,7 @@ RSpec.describe "/oauth_clients/:oauth_client_id/ensure_connection endpoint", :we
 
   before do
     Storages::Peripherals::Registry.stub(
-      "#{storage}.queries.auth_check",
+      "#{storage.short_provider_type}.queries.auth_check",
       ->(_) { ServiceResult.success }
     )
   end
@@ -66,7 +64,7 @@ RSpec.describe "/oauth_clients/:oauth_client_id/ensure_connection endpoint", :we
 
           before do
             Storages::Peripherals::Registry.stub(
-              "#{storage}.queries.auth_check",
+              "#{storage.short_provider_type}.queries.auth_check",
               ->(_) { ServiceResult.failure(errors: Storages::StorageError.new(code: :unauthorized)) }
             )
 

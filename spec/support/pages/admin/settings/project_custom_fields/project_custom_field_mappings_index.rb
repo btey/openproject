@@ -32,12 +32,18 @@ module Pages
   module Admin
     module Settings
       module ProjectCustomFields
-        class ProjectCustomFieldMappingsIndex < ::Pages::Admin::CustomFields::CustomFieldsProjects::CustomFieldProjectsIndex
-          def path(project_custom_field)
+        class ProjectCustomFieldMappingsIndex < ::Pages::Projects::Index
+          def path
             "/admin/settings/project_custom_fields/#{project_custom_field.id}/project_mappings"
           end
 
-          def row_id_prefix = "#settings-project-custom-fields-project-custom-field-mapping-row-component-project"
+          def within_row(project)
+            row = page.find("#settings-project-custom-fields-project-custom-field-mapping-row-component-project-#{project.id}")
+            row.hover
+            within row do
+              yield row
+            end
+          end
         end
       end
     end

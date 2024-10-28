@@ -60,10 +60,6 @@ RSpec.describe Query::Results, "Sorting by custom field" do
     create(:work_package, type:, project:, custom_values: { custom_field.id => value })
   end
 
-  def wp_without_cf_value
-    create(:work_package, type:, project:)
-  end
-
   shared_examples "it sorts" do
     let(:work_package_desc) { work_packages.reverse }
 
@@ -94,7 +90,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
 
       let(:work_packages) do
         [
-          wp_without_cf_value,
+          create(:work_package, type:, project:),
           wp_with_cf_value("16"),
           wp_with_cf_value("6.25")
         ]
@@ -108,7 +104,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
 
       let(:work_packages) do
         [
-          wp_without_cf_value,
+          create(:work_package, type:, project:),
           wp_with_cf_value("https://openproject.org/intro/"),
           wp_with_cf_value("https://openproject.org/pricing/")
         ]
@@ -122,7 +118,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
 
       let(:work_packages) do
         [
-          wp_without_cf_value,
+          create(:work_package, type:, project:),
           wp_with_cf_value("6"),
           wp_with_cf_value("16")
         ]
@@ -136,7 +132,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
 
       let(:work_packages) do
         [
-          wp_without_cf_value,
+          create(:work_package, type:, project:),
           wp_with_cf_value("6.25"),
           wp_with_cf_value("16")
         ]
@@ -150,7 +146,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
 
       let(:work_packages) do
         [
-          wp_without_cf_value,
+          create(:work_package, type:, project:),
           wp_with_cf_value("2024-01-01"),
           wp_with_cf_value("2030-01-01"),
           wp_with_cf_value("999-01-01") # TODO: should be at index 1
@@ -165,7 +161,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
 
       let(:work_packages) do
         [
-          wp_without_cf_value,
+          create(:work_package, type:, project:),
           wp_with_cf_value("0"),
           wp_with_cf_value("1")
         ]
@@ -187,7 +183,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
             wp_with_cf_value(id_by_value.fetch("100")),
             wp_with_cf_value(id_by_value.fetch("3")),
             wp_with_cf_value(id_by_value.fetch("20")),
-            wp_without_cf_value # TODO: should be at index 0
+            create(:work_package, type:, project:) # TODO: should be at index 0
           ]
         end
       end
@@ -199,7 +195,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
 
         let(:work_packages) do
           [
-            wp_without_cf_value,
+            create(:work_package, type:, project:),
             # TODO: sorting is done by values sorted by position and joined by `.`, why?
             wp_with_cf_value(id_by_value.fetch_values("100")),            # => 100
             wp_with_cf_value(id_by_value.fetch_values("20", "100")),      # => 100.20
@@ -243,7 +239,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
             wp_with_cf_value(id_by_login.fetch("ba")),
             wp_with_cf_value(id_by_login.fetch("bb1")),
             wp_with_cf_value(id_by_login.fetch("bb2")),
-            wp_without_cf_value # TODO: should be at index 0
+            create(:work_package, type:, project:) # TODO: should be at index 0
           ]
         end
       end
@@ -260,7 +256,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
             # TODO: second user is ignored
             wp_with_cf_value(id_by_login.fetch_values("bb1", "ba")),
             wp_with_cf_value(id_by_login.fetch_values("bb1", "ax")),
-            wp_without_cf_value # TODO: should be at index 0
+            create(:work_package, type:, project:) # TODO: should be at index 0
           ]
         end
 
@@ -291,7 +287,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
             wp_with_cf_value(id_by_name.fetch("10.10.2")),
             wp_with_cf_value(id_by_name.fetch("10.2")),
             wp_with_cf_value(id_by_name.fetch("9")),
-            wp_without_cf_value # TODO: should be at index 0
+            create(:work_package, type:, project:) # TODO: should be at index 0
           ]
         end
       end
@@ -308,7 +304,7 @@ RSpec.describe Query::Results, "Sorting by custom field" do
             # TODO: second version is ignored
             wp_with_cf_value(id_by_name.fetch_values("9", "10.10.2")),
             wp_with_cf_value(id_by_name.fetch_values("9", "10.10.10")),
-            wp_without_cf_value # TODO: should be at index 0
+            create(:work_package, type:, project:) # TODO: should be at index 0
           ]
         end
 

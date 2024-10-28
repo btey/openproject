@@ -43,7 +43,7 @@ module Roles
       else
         assignable_member_permissions
       end.reject do |permission|
-        (!keep_public && permission.public?) || permission.hidden?
+        !keep_public && permission.public?
       end
     end
 

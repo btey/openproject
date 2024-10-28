@@ -43,18 +43,10 @@ class CustomStylesController < ApplicationController
                      only: UNGUARDED_ACTIONS
   no_authorization_required! *UNGUARDED_ACTIONS
 
-  def default_url_options
-    super.merge(tab: params[:tab])
-  end
-
   def show
     @custom_style = CustomStyle.current || CustomStyle.new
     @current_theme = @custom_style.theme
     @theme_options = options_for_theme_select
-
-    if params[:tab].blank?
-      redirect_to tab: "interface"
-    end
   end
 
   def create
@@ -63,7 +55,7 @@ class CustomStylesController < ApplicationController
       redirect_to custom_style_path
     else
       flash[:error] = @custom_style.errors.full_messages
-      render action: :show, status: :unprocessable_entity
+      render action: :show
     end
   end
 
@@ -73,7 +65,7 @@ class CustomStylesController < ApplicationController
       redirect_to custom_style_path
     else
       flash[:error] = @custom_style.errors.full_messages
-      render action: :show, status: :unprocessable_entity
+      render action: :show
     end
   end
 
@@ -140,9 +132,11 @@ class CustomStylesController < ApplicationController
   end
 
   def update_themes
+    theme = OpenProject::CustomStyles::ColorThemes.themes.find { |t| t[:theme] == params[:theme] }
+
     call = ::Design::UpdateDesignService
-       .new(theme_from_params)
-       .call
+      .new(theme)
+      .call
 
     call.on_success do
       flash[:notice] = I18n.t(:notice_successful_update)
@@ -152,14 +146,14 @@ class CustomStylesController < ApplicationController
       flash[:error] = call.message
     end
 
-    redirect_to custom_style_path
+    redirect_to action: :show
+  end
+
+  def show_local_breadcrumb
+    false
   end
 
   private
-
-  def theme_from_params
-    OpenProject::CustomStyles::ColorThemes.themes.find { |t| t[:theme] == params[:theme] }
-  end
 
   def options_for_theme_select
     options = OpenProject::CustomStyles::ColorThemes.themes.pluck(:theme)

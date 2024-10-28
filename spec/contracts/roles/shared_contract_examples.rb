@@ -71,17 +71,12 @@ RSpec.shared_examples_for "roles contract" do
   end
 
   describe "#assignable_permissions" do
-    def permission(name:, public:, visible: true)
-      OpenProject::AccessControl::Permission.new(name, {}, permissible_on: :dummy, public:, visible:)
-    end
-    let(:permission1) { permission(name: :perm1, public: false, visible: true) }
-    let(:permission2) { permission(name: :perm2, public: true, visible: true) }
-    let(:permission3) { permission(name: :perm3, public: false, visible: true) }
-    let(:permission4) { permission(name: :perm4, public: false, visible: false) }
+    let(:permission1) { instance_double(OpenProject::AccessControl::Permission, name: :perm1, public?: false) }
+    let(:permission2) { instance_double(OpenProject::AccessControl::Permission, name: :perm2, public?: true) }
+    let(:permission3) { instance_double(OpenProject::AccessControl::Permission, name: :perm3, public?: false) }
 
-    let(:all_permissions) { [permission1, permission2, permission3, permission4] }
+    let(:all_permissions) { [permission1, permission2, permission3] }
     let(:public_permissions) { [permission2] }
-    let(:hidden_permissions) { [permission4] }
 
     context "for a project role" do
       before do
@@ -89,7 +84,7 @@ RSpec.shared_examples_for "roles contract" do
       end
 
       it "is all project permissions" do
-        expect(contract.assignable_permissions).to match_array(all_permissions - public_permissions - hidden_permissions)
+        expect(contract.assignable_permissions).to match_array(all_permissions - public_permissions)
       end
     end
 
@@ -101,7 +96,7 @@ RSpec.shared_examples_for "roles contract" do
       end
 
       it "is all work package permissions" do
-        expect(contract.assignable_permissions).to match_array(all_permissions - public_permissions - hidden_permissions)
+        expect(contract.assignable_permissions).to match_array(all_permissions - public_permissions)
       end
     end
 
@@ -113,7 +108,7 @@ RSpec.shared_examples_for "roles contract" do
       end
 
       it "is all the global permissions" do
-        expect(contract.assignable_permissions).to match_array(all_permissions - public_permissions - hidden_permissions)
+        expect(contract.assignable_permissions).to match_array(all_permissions - public_permissions)
       end
     end
   end

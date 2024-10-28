@@ -28,7 +28,7 @@
 
 module Storages
   module Admin
-    class EditFormHeaderComponent < ApplicationComponent
+    class EditFormHeaderComponent < ApplicationComponent # rubocop:disable OpenProject/AddPreviewForViewComponent
       TAB_NAVS = %i[
         edit
         project_storages

@@ -8,8 +8,10 @@
                  [(ngModel)]="displayMode"
                  value="default"
                  name="display_mode_switch">
-          <svg op-no-hierarchy-icon size="small" [attr.icon-title]="text.display_mode.default"></svg>
+          <op-icon icon-classes="icon-no-hierarchy" [attr.icon-title]="text.display_mode.default"></op-icon>
+          &ngsp;
           <span [textContent]="text.display_mode.default"></span>
+          &ngsp;
           <span class="form--inline-instructions" [textContent]="text.default"></span>
         </label>
       </div>
@@ -21,8 +23,10 @@
                  [(ngModel)]="displayMode"
                  value="hierarchy"
                  name="display_mode_switch">
-          <svg op-hierarchy-icon size="small"[attr.icon-title]="text.display_mode.hierarchy"></svg>
+          <op-icon icon-classes="icon-hierarchy" [attr.icon-title]="text.display_mode.hierarchy"></op-icon>
+          &ngsp;
           <span [textContent]="text.display_mode.hierarchy"></span>
+          &ngsp;
           <span *ngIf="displayMode === 'hierarchy'"
                 class="form--inline-instructions"
                 [textContent]="text.display_mode.hierarchy_hint"></span>
@@ -36,8 +40,10 @@
                  [(ngModel)]="displayMode"
                  value="grouped"
                  name="display_mode_switch">
-          <svg op-group-icon size="small" [attr.icon-title]="text.label_group_by"></svg>
+          <op-icon icon-classes="icon-group-by" [attr.icon-title]="text.label_group_by"></op-icon>
+          &ngsp;
           <span [textContent]="text.label_group_by"></span>
+          &ngsp;
           <select (change)="updateGroup($event.target.value)"
                   id="selected_grouping"
                   name="selected_grouping"

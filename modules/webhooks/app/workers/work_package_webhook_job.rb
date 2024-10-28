@@ -31,7 +31,10 @@ class WorkPackageWebhookJob < RepresentedWebhookJob
     :work_package
   end
 
-  def payload_representer_class
-    ::API::V3::WorkPackages::WorkPackageRepresenter
+  def payload_representer
+    User.system.run_given do |user|
+      ::API::V3::WorkPackages::WorkPackageRepresenter
+        .create(resource, current_user: user, embed_links: true)
+    end
   end
 end

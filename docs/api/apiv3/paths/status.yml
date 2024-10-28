@@ -1,54 +1,53 @@
 # /api/v3/statuses/{id}
 ---
 get:
-  summary: Get a work package status
-  operationId: get_status
-  tags:
-    - Statuses
-  description: |-
-    Returns a work package status by its unique identifier.
   parameters:
-    - name: id
-      description: Status id
-      in: path
-      required: true
-      schema:
-        type: integer
-      example: '1'
+  - description: Status id
+    example: '1'
+    in: path
+    name: id
+    required: true
+    schema:
+      type: integer
   responses:
     '200':
-      description: OK
       content:
         application/hal+json:
           examples:
             response:
-              $ref: '../components/examples/status_response.yml'
+              value:
+                _links:
+                  self:
+                    href: "/api/v3/statuses/1"
+                _type: Status
+                defaultDoneRatio: 0
+                id: 1
+                isClosed: false
+                isDefault: true
+                name: New
+                position: 1
           schema:
-            $ref: '../components/schemas/status_model.yml'
+            "$ref": "../components/schemas/status_model.yml"
+      description: OK
+      headers: {}
     '403':
-      description: |-
-        Returned if the client does not have sufficient permissions.
-
-        **Required permission:** view work package (on any project)
       content:
         application/hal+json:
           schema:
-            $ref: '../components/schemas/error_response.yml'
+            $ref: "../components/schemas/error_response.yml"
           examples:
             response:
               value:
                 _type: Error
                 errorIdentifier: urn:openproject-org:api:v3:errors:MissingPermission
                 message: You are not allowed to see this status.
-    '404':
-      description: Returned if the status does not exist.
-      content:
-        application/hal+json:
-          schema:
-            $ref: '../components/schemas/error_response.yml'
-          examples:
-            response:
-              value:
-                _type: Error
-                errorIdentifier: urn:openproject-org:api:v3:errors:NotFound
-                message: The requested resource could not be found.
+      description: |-
+        Returned if the client does not have sufficient permissions.
+
+        **Required permission:** view work package (on any project)
+      headers: {}
+  tags:
+  - Statuses
+  description: ''
+  operationId: View_Status
+  summary: View Status

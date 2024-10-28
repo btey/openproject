@@ -32,7 +32,7 @@
 # for every "column" defined below.
 module Storages::ProjectStorages::Projects
   class TableComponent < Projects::TableComponent
-    include ::Projects::Concerns::TableComponent::StreamablePaginationLinksConstraints
+    include OpTurbo::Streamable
 
     options :storage
 

@@ -32,6 +32,7 @@ class Storages::Admin::Storages::ProjectStoragesController < ApplicationControll
   include OpTurbo::ComponentStream
   include OpTurbo::DialogStreamHelper
   include FlashMessagesOutputSafetyHelper
+  include ApplicationComponentStreams
   include Storages::OAuthAccessGrantable
 
   layout "admin"
@@ -117,8 +118,7 @@ class Storages::Admin::Storages::ProjectStoragesController < ApplicationControll
   def destroy_confirmation_dialog
     respond_with_dialog Storages::ProjectStorages::DestroyConfirmationDialogComponent.new(
       storage: @storage,
-      project_storage: @project_storage,
-      params:
+      project_storage: @project_storage
     )
   end
 
@@ -129,7 +129,8 @@ class Storages::Admin::Storages::ProjectStoragesController < ApplicationControll
 
     delete_service.on_success do
       update_flash_message_via_turbo_stream(
-        message: I18n.t(:notice_successful_delete), scheme: :success
+        message: I18n.t(:notice_successful_delete),
+        full: true, dismiss_scheme: :hide, scheme: :success
       )
       update_project_list_via_turbo_stream(url_for_action: :index)
     end
@@ -137,7 +138,8 @@ class Storages::Admin::Storages::ProjectStoragesController < ApplicationControll
     delete_service.on_failure do |failure|
       error = failure.errors.map(&:message).to_sentence
       render_error_flash_message_via_turbo_stream(
-        message: I18n.t("project_storages.remove_project.deletion_failure_flash", error:)
+        message: I18n.t("project_storages.remove_project.deletion_failure_flash", error:),
+        full: true, dismiss_scheme: :hide
       )
     end
 
@@ -149,7 +151,9 @@ class Storages::Admin::Storages::ProjectStoragesController < ApplicationControll
   def load_project_storage
     @project_storage = Storages::ProjectStorage.find(params[:id])
   rescue ActiveRecord::RecordNotFound
-    render_error_flash_message_via_turbo_stream(message: t(:notice_file_not_found))
+    update_flash_message_via_turbo_stream(
+      message: t(:notice_file_not_found), full: true, dismiss_scheme: :hide, scheme: :danger
+    )
     update_project_list_via_turbo_stream
 
     respond_with_turbo_streams
@@ -171,7 +175,8 @@ class Storages::Admin::Storages::ProjectStoragesController < ApplicationControll
       respond_with_turbo_streams
     end
   rescue ActiveRecord::RecordNotFound
-    render_error_flash_message_via_turbo_stream(message: t(:notice_project_not_found))
+    update_flash_message_via_turbo_stream message: t(:notice_project_not_found), full: true, dismiss_scheme: :hide,
+                                          scheme: :danger
     update_project_list_via_turbo_stream
 
     respond_with_turbo_streams
@@ -182,7 +187,7 @@ class Storages::Admin::Storages::ProjectStoragesController < ApplicationControll
       component: Storages::ProjectStorages::Projects::TableComponent.new(
         query: storage_projects_query,
         storage: @storage,
-        params: params.merge({ url_for_action: })
+        params: { url_for_action: }
       )
     )
   end
@@ -209,8 +214,11 @@ class Storages::Admin::Storages::ProjectStoragesController < ApplicationControll
   def ensure_storage_configured!
     return if @storage.configured?
 
-    render_error_flash_message_via_turbo_stream(
-      message: I18n.t("storages.enabled_in_projects.setup_incomplete_description")
+    update_flash_message_via_turbo_stream(
+      message: I18n.t("storages.enabled_in_projects.setup_incomplete_description"),
+      full: true,
+      dismiss_scheme: :hide,
+      scheme: :danger
     )
     respond_with_turbo_streams
     false

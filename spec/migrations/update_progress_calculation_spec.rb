@@ -194,7 +194,6 @@ RSpec.describe UpdateProgressCalculation, type: :model do
             wp both w and pc set      |  10h |                |        60%
             wp only w set 0h          |   0h |                |
           TABLE
-          # % Complete is discarded and derived because of the "disabled" mode
           to: <<~TABLE
             subject                   | work | remaining work | % complete
             wp only w set             |  10h |            10h |         0%
@@ -214,7 +213,6 @@ RSpec.describe UpdateProgressCalculation, type: :model do
             wp both rw and pc set     |      |             4h |        60%
             wp only rw set 0h         |      |             0h |
           TABLE
-          # % Complete is discarded and derived because of the "disabled" mode
           to: <<~TABLE
             subject                   | work | remaining work | % complete
             wp only rw set            |   4h |             4h |         0%
@@ -235,7 +233,6 @@ RSpec.describe UpdateProgressCalculation, type: :model do
             wp all set consistent     |  10h |             4h |        60%
             wp all set inconsistent   |  10h |             1h |        10%
           TABLE
-          # % Complete is discarded and derived because of the "disabled" mode
           to: <<~TABLE
             subject                   | work | remaining work | % complete
             wp both w and rw set      |  10h |             4h |        60%
@@ -257,7 +254,6 @@ RSpec.describe UpdateProgressCalculation, type: :model do
             wp all set inconsistent   |  10h |            10h |        60%
             wp all set inconsistent 0h|   0h |             0h |        60%
           TABLE
-          # % Complete is discarded and derived because of the "disabled" mode
           to: <<~TABLE
             subject                   | work | remaining work | % complete
             wp both w and rw set      |  10h |            10h |         0%
@@ -277,7 +273,6 @@ RSpec.describe UpdateProgressCalculation, type: :model do
             wp both w and big rw set  |  10h |            99h |
             wp all set big wp         |  10h |            99h |        60%
           TABLE
-          # % Complete is discarded and derived because of the "disabled" mode
           to: <<~TABLE
             subject                   | work | remaining work | % complete
             wp both w and big rw set  |  10h |            10h |         0%
@@ -498,7 +493,7 @@ RSpec.describe UpdateProgressCalculation, type: :model do
           to: <<~TABLE
             subject                   | work | remaining work | % complete
             wp all set consistent     |  10h |             4h |        60%
-            wp all set inconsistent   |  10h |             9h |        10%
+            wp all set inconsistent   |  10h |             1h |        90%
           TABLE
         )
       end
@@ -516,7 +511,7 @@ RSpec.describe UpdateProgressCalculation, type: :model do
           to: <<~TABLE
             subject                   | work | remaining work | % complete
             wp all set consistent     |  10h |            10h |         0%
-            wp all set inconsistent   |  10h |             4h |        60%
+            wp all set inconsistent   |  10h |            10h |         0%
             wp all set 0h             |   0h |             0h |
           TABLE
         )
@@ -828,14 +823,14 @@ RSpec.describe UpdateProgressCalculation, type: :model do
         run_migration
       end
 
-      it "fixes the total values and sets ∑ % complete to nil (not 0) and keeps % complete (unless wrong)" do
+      it "fixes the total values and sets ∑ % complete to nil (not 0) but keeps % complete (unless wrong)" do
         expect_work_packages(table_work_packages.map(&:reload), <<~TABLE)
           subject            | work  | remaining work | % complete | ∑ work | ∑ remaining work | ∑ % complete |
           wp zero            |       |                |          0 |        |                  |              |
           wp correct         |  100h |            50h |         50 |   100h |              50h |           50 |
             wp correct child |       |                |            |        |                  |              |
-          wp wrong           |       |                |         90 |   100h |              80h |           20 |
-            wp wrong child   |  100h |            80h |         20 |        |                  |              |
+          wp wrong           |       |                |         90 |   100h |              50h |           50 |
+            wp wrong child   |  100h |            50h |         50 |        |                  |              |
         TABLE
       end
 
@@ -863,17 +858,14 @@ RSpec.describe UpdateProgressCalculation, type: :model do
           .to eql [nil, 50]
       end
 
-      it "creates a journal for the work package transitioning ∑ remaining work from 50h to 80h " \
-         "and ∑ % complete from 90% to 20%" do
+      it "creates a journal for the work package transitioning ∑ % complete from 90 to 50" do
         expect(wp_wrong.journals.count).to eq(2)
 
         expect(wp_wrong.journals.first.get_changes.keys)
           .not_to include("derived_done_ratio")
 
-        expect(wp_wrong.journals.last.get_changes).to include(
-          "derived_remaining_hours" => [50.0, 80.0],
-          "derived_done_ratio" => [nil, 20]
-        )
+        expect(wp_wrong.journals.last.get_changes["derived_done_ratio"])
+          .to eql [nil, 50]
       end
     end
   end

@@ -35,7 +35,7 @@ RSpec.describe Admin::Settings::DateFormatSettingsController do
   shared_let(:user) { create(:admin) }
   current_user { user }
 
-  include_examples "GET #show requires admin permission and renders template", path: "date_format_settings"
+  require_admin_and_render_template("date_format_settings")
 
   describe "PATCH #update" do
     subject { patch "update", params: }

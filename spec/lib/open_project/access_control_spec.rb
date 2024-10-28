@@ -455,18 +455,22 @@ RSpec.describe OpenProject::AccessControl do
     before do
       described_class.map do |map|
         map.project_module :some_module do |mod|
-          # will be disabled a few lines later in the spec
-          mod.permission :disabled_permission,
+          mod.permission :disabled_permission1,
                          { some: :action },
-                         permissible_on: :project
+                         permissible_on: :project,
+                         enabled: false
+
+          mod.permission :disabled_permission2,
+                         { some: :action,
+                           another: :action },
+                         permissible_on: :project,
+                         enabled: -> { false }
 
           mod.permission :enabled_permission,
                          { another: :action },
                          permissible_on: :project
         end
       end
-      permission_to_disable = described_class.permissions.find { _1.name == :disabled_permission }
-      permission_to_disable.disable!
     end
 
     it "is false for enabled permissions" do
@@ -476,7 +480,7 @@ RSpec.describe OpenProject::AccessControl do
 
     it "is true for disabled permission" do
       expect(subject)
-        .to be_disabled_permission(:disabled_permission)
+        .to be_disabled_permission(:disabled_permission1)
     end
 
     it "is true for action hash where permissions granting are disabled" do

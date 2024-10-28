@@ -103,7 +103,7 @@ RSpec.describe "Project Custom Field Mappings", :js do
       subproject = create(:project, parent: project)
       click_on "Add projects"
 
-      within_test_selector("new-custom-field-projects-modal") do
+      within_test_selector("settings--new-project-custom-field-mapping-component") do
         autocompleter = page.find(".op-project-autocompleter")
         autocompleter.fill_in with: project.name
 
@@ -119,25 +119,38 @@ RSpec.describe "Project Custom Field Mappings", :js do
       expect(page).to have_text(subproject.name)
 
       aggregate_failures "pagination links maintain the correct url" do
-        project_custom_field_mappings_page.expect_page_sizes(model: project_custom_field)
+        within ".op-pagination" do
+          pagination_links = page.all(".op-pagination--item-link")
+          expect(pagination_links.size).to be_positive
+
+          pagination_links.each do |pagination_link|
+            uri = URI.parse(pagination_link["href"])
+            expect(uri.path).to eq(project_mappings_admin_settings_project_custom_field_path(project_custom_field))
+          end
+        end
       end
     end
 
-    it "allows unlinking a project from a custom field", with_settings: { per_page_options: "2,5" } do
-      projects = create_list(:project, 4)
-      projects.each { |project| create(:project_custom_field_project_mapping, project_custom_field:, project:) }
+    it "allows unlinking a project from a custom field" do
+      project = create(:project)
+      create(:project_custom_field_project_mapping, project_custom_field:, project:)
 
-      current_page = 3
-      visit project_mappings_admin_settings_project_custom_field_path(project_custom_field, page: current_page)
+      visit project_mappings_admin_settings_project_custom_field_path(project_custom_field)
 
-      project = project_custom_field_mappings_page.project_in_first_row
       project_custom_field_mappings_page.click_menu_item_of("Remove from project", project)
 
       expect(page).to have_no_text(project.name)
 
       aggregate_failures "pagination links maintain the correct url after unlinking is done" do
-        project_custom_field_mappings_page.expect_page_links(model: project_custom_field, current_page:)
-        project_custom_field_mappings_page.expect_current_page_number(current_page)
+        within ".op-pagination" do
+          pagination_links = page.all(".op-pagination--item-link")
+          expect(pagination_links.size).to be_positive
+
+          pagination_links.each do |pagination_link|
+            uri = URI.parse(pagination_link["href"])
+            expect(uri.path).to eq(project_mappings_admin_settings_project_custom_field_path(project_custom_field))
+          end
+        end
       end
     end
 
@@ -146,7 +159,6 @@ RSpec.describe "Project Custom Field Mappings", :js do
 
       it "renders a blank slate" do
         expect(page).to have_text("Required in all projects")
-        expect(page).not_to have_test_selector("add-projects-sub-header")
       end
     end
   end

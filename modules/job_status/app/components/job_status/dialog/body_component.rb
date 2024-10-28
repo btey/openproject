@@ -98,9 +98,7 @@ module JobStatus
       def icon
         return { icon: :"x-circle", color: :danger } if job.nil? || has_error?
 
-        return { icon: :"issue-closed", color: :success } if success_statuses.include?(job.status)
-
-        { icon: :none }
+        { icon: :"issue-closed", color: :success } if success_statuses.include?(job.status)
       end
 
       def title

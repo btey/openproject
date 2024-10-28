@@ -31,10 +31,10 @@
 
 require "spec_helper"
 
-RSpec.describe Admin::Settings::IncomingMailsSettingsController do
+RSpec.describe Admin::Settings::IncomingMailsSettingsController do # rubocop:disable RSpec/EmptyExampleGroup
   shared_let(:user) { create(:admin) }
 
   current_user { user }
 
-  include_examples "GET #show requires admin permission and renders template", path: "incoming_mails_settings"
+  require_admin_and_render_template("incoming_mails_settings")
 end

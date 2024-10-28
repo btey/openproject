@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) the OpenProject GmbH
@@ -35,7 +33,7 @@ RSpec.describe Storages::Peripherals::OneDriveConnectionValidator do
   let(:storage) { create(:one_drive_storage, oauth_client: create(:oauth_client)) }
 
   before do
-    Storages::Peripherals::Registry.stub("#{storage}.queries.files", ->(_) { response })
+    Storages::Peripherals::Registry.stub("#{storage.short_provider_type}.queries.files", ->(_) { response })
   end
 
   subject { described_class.new(storage:).validate }

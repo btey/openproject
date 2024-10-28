@@ -32,12 +32,11 @@ module Storages::ProjectStorages
     include OpTurbo::Streamable
     include OpPrimer::ComponentHelpers
 
-    def initialize(storage:, project_storage:, params: {})
+    def initialize(storage:, project_storage:)
       super
 
       @storage = storage
       @project_storage = project_storage
-      @params = params
     end
 
     def id
@@ -55,10 +54,6 @@ module Storages::ProjectStorages
         text << I18n.t("project_storages.remove_project.dialog.automatically_managed_appendix")
       end
       text
-    end
-
-    def current_page
-      @params[:page]
     end
 
     def confirmation_text

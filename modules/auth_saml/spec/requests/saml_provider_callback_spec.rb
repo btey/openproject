@@ -29,9 +29,7 @@
 require "spec_helper"
 require "rack/test"
 
-RSpec.describe "SAML provider callback",
-               type: :rails_request,
-               with_ee: %i[openid_providers] do
+RSpec.describe "SAML provider callback", with_ee: %i[openid_providers] do
   include Rack::Test::Methods
   include API::V3::Utilities::PathHelper
 
@@ -81,11 +79,10 @@ RSpec.describe "SAML provider callback",
     }
   end
 
-  shared_examples "request fails" do |message|
+  shared_examples "request fails" do
     it "redirects to the failure page" do
       expect(subject.status).to eq(302)
-      follow_redirect!
-      expect(last_response.body).to have_text message
+      expect(subject.headers["Location"]).to eq("/auth/failure?message=invalid_ticket&strategy=saml")
     end
   end
 
@@ -101,13 +98,13 @@ RSpec.describe "SAML provider callback",
       end
     end
 
-    it_behaves_like "request fails", "Current time is earlier than NotBefore condition"
+    it_behaves_like "request fails"
   end
 
   context "with an invalid fingerprint" do
     let(:fingerprint) { "invalid" }
 
-    it_behaves_like "request fails", "Fingerprint mismatch"
+    it_behaves_like "request fails"
   end
 
   context "with a RelayState present" do

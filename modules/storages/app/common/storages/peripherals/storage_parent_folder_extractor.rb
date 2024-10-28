@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 #-- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) the OpenProject GmbH
@@ -30,15 +28,19 @@
 
 module Storages
   module Peripherals
-    ParentFolder = Data.define(:path) do
-      delegate :split, :empty?, to: :path
+    class ParentFolder
+      attr_reader :path
+
+      def initialize(path)
+        @path = path
+      end
 
       def root?
-        path == "/"
+        @path == "/"
       end
 
       def to_s
-        path
+        @path
       end
     end
 

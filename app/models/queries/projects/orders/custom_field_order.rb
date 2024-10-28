@@ -29,26 +29,32 @@
 class Queries::Projects::Orders::CustomFieldOrder < Queries::Orders::Base
   self.model = Project.all
 
-  EXCLUDED_CUSTOM_FIELD_TYPES = %w[text].freeze
+  EXCLUDED_CUSTOM_FIELD_TYPES = %w(text)
+  KEY_FORMAT = /cf_(\d+)/
 
   validates :custom_field, presence: { message: I18n.t(:"activerecord.errors.messages.does_not_exist") }
 
   def self.key
     valid_ids = RequestStore.fetch(:custom_sortable_project_custom_fields) do
-      scope.pluck(:id)
+      ProjectCustomField.where.not(field_format: EXCLUDED_CUSTOM_FIELD_TYPES).visible.pluck(:id).join("|")
     end
 
-    /\Acf_(#{valid_ids.join('|')})\z/
-  end
-
-  def self.scope
-    ProjectCustomField.where.not(field_format: EXCLUDED_CUSTOM_FIELD_TYPES).visible
+    /cf_(#{valid_ids})/
   end
 
   def custom_field
-    return @custom_field if defined?(@custom_field)
+    @custom_field ||= begin
+      id = KEY_FORMAT.match(attribute)[1]
 
-    @custom_field = self.class.scope.find_by(id: attribute[/\Acf_(\d+)\z/, 1])
+      ProjectCustomField
+      .where.not(field_format: EXCLUDED_CUSTOM_FIELD_TYPES)
+      .visible
+      .find_by(id:)
+    end
+  end
+
+  def apply_to(_query_scope)
+    super.select(custom_field.order_statements)
   end
 
   def available?

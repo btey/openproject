@@ -30,9 +30,10 @@
 
 import { ApplicationController } from 'stimulus-use';
 import { renderStreamMessage } from '@hotwired/turbo';
-import { TurboHelpers } from '../../turbo/helpers';
 
 export default class AsyncDialogController extends ApplicationController {
+  private loadingDialog:HTMLDialogElement|null;
+
   connect() {
     this.element.addEventListener('click', (e) => {
       e.preventDefault();
@@ -41,20 +42,48 @@ export default class AsyncDialogController extends ApplicationController {
   }
 
   triggerTurboStream():void {
-    TurboHelpers.showProgressBar();
+    let loaded = false;
 
-    void fetch(this.href, {
+    setTimeout(() => {
+      if (!loaded) {
+        this.addLoading();
+      }
+    }, 100);
+
+    fetch(this.href, {
       method: this.method,
       headers: {
         Accept: 'text/vnd.turbo-stream.html',
       },
     }).then((r) => r.text())
       .then((html) => {
+        loaded = true;
         renderStreamMessage(html);
       })
-      .finally(() => {
-        TurboHelpers.hideProgressBar();
-      });
+      .finally(() => this.removeLoading());
+  }
+
+  removeLoading() {
+    this.loadingDialog?.remove();
+  }
+
+  addLoading() {
+    this.removeLoading();
+    const dialog = document.createElement('dialog');
+    dialog.classList.add('Overlay', 'Overlay--size-medium', 'Overlay--motion-scaleFade');
+    dialog.style.height = '150px';
+    dialog.style.display = 'grid';
+    dialog.style.placeContent = 'center';
+    dialog.id = 'loading';
+    dialog.innerHTML = `
+    <svg style="box-sizing: content-box; color: var(--color-icon-primary);" width="32" height="32" viewBox="0 0 16 16" fill="none" data-view-component="true" class="anim-rotate">
+      <circle cx="8" cy="8" r="7" stroke="currentColor" stroke-opacity="0.25" stroke-width="2" vector-effect="non-scaling-stroke" fill="none" />
+      <path d="M15 8a7.002 7.002 0 00-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" vector-effect="non-scaling-stroke" />
+    </svg>
+    `;
+    document.body.appendChild(dialog);
+    dialog.showModal();
+    this.loadingDialog = dialog;
   }
 
   get href() {

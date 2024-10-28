@@ -79,10 +79,6 @@ class WorkPackages::SetAttributesService
       DurationConverter.valid?(work_package.estimated_hours_before_type_cast)
     end
 
-    def work_invalid?
-      !work_valid?
-    end
-
     def remaining_work
       work_package.remaining_hours
     end
@@ -119,10 +115,6 @@ class WorkPackages::SetAttributesService
       DurationConverter.valid?(work_package.remaining_hours_before_type_cast)
     end
 
-    def remaining_work_invalid?
-      !remaining_work_valid?
-    end
-
     def percent_complete
       work_package.done_ratio
     end
@@ -157,8 +149,8 @@ class WorkPackages::SetAttributesService
 
     private
 
-    def set_hint(field, hint, **params)
-      work_package.set_derived_progress_hint(field, hint, **params)
+    def set_hint(field, hint)
+      work_package.derived_progress_hints[field] = hint
     end
 
     def round_progress_values
