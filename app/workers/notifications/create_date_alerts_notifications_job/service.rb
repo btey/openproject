@@ -32,6 +32,7 @@ class Notifications::CreateDateAlertsNotificationsJob::Service
   end
 
   def call
+    return unless EnterpriseToken.allows_to?(:date_alerts)
 
     Time.use_zone(user.time_zone) do
       send_date_alert_notifications(user)

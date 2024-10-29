@@ -36,15 +36,15 @@ module OpenProject::TeamPlanner
              author_url: "https://www.openproject.org",
              bundled: true,
              settings: {} do
-      project_module :team_planner_view, dependencies: :work_package_tracking do
+      project_module :team_planner_view, dependencies: :work_package_tracking, enterprise_feature: true do
         permission :view_team_planner,
-                   { "team_planner/team_planner": %i[index show overview],
+                   { "team_planner/team_planner": %i[index show upsale overview],
                      "team_planner/menus": %i[show] },
                    permissible_on: :project,
                    dependencies: %i[view_work_packages],
                    contract_actions: { team_planner: %i[read] }
         permission :manage_team_planner,
-                   { "team_planner/team_planner": %i[index show new create destroy] },
+                   { "team_planner/team_planner": %i[index show new create destroy upsale] },
                    permissible_on: :project,
                    dependencies: %i[view_team_planner
                                     add_work_packages
@@ -66,14 +66,16 @@ module OpenProject::TeamPlanner
            before: :boards,
            after: :calendar_view,
            icon: "op-team-planner",
-           if: should_render_global_menu_item
+           if: should_render_global_menu_item,
+           enterprise_feature: "team_planner_view"
 
       menu :project_menu,
            :team_planner_view,
            { controller: "/team_planner/team_planner", action: :index },
            caption: :"team_planner.label_team_planner_plural",
            after: :work_packages,
-           icon: "op-team-planner"
+           icon: "op-team-planner",
+           enterprise_feature: "team_planner_view"
 
       menu :project_menu,
            :team_planner_menu,
@@ -90,7 +92,8 @@ module OpenProject::TeamPlanner
            before: :boards,
            after: :calendar_view,
            icon: "op-team-planner",
-           if: should_render_global_menu_item
+           if: should_render_global_menu_item,
+           enterprise_feature: "team_planner_view"
     end
 
     add_view :TeamPlanner,

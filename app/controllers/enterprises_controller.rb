@@ -1,6 +1,6 @@
 #-- copyright
 # OpenProject is an open source project management software.
-# Copyright (C) 2012-2024 the OpenProject GmbH
+# Copyright (C) the OpenProject GmbH
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License version 3.
@@ -26,6 +26,7 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 class EnterprisesController < ApplicationController
+  include EnterpriseTrialHelper
 
   layout "admin"
   menu_item :enterprise
@@ -35,12 +36,15 @@ class EnterprisesController < ApplicationController
   before_action :require_admin
   before_action :check_user_limit, only: [:show]
   before_action :check_domain, only: [:show]
+  before_action :render_gon
 
   def show
     @current_token = EnterpriseToken.current
     @token = @current_token || EnterpriseToken.new
 
-
+    if !@current_token.present?
+      helpers.write_trial_key_to_gon
+    end
   end
 
   def create
@@ -90,12 +94,14 @@ class EnterprisesController < ApplicationController
 
   private
 
-  def default_breadcrumb
-    t(:label_enterprise_edition)
+  def render_gon
+    helpers.write_augur_to_gon
   end
 
+  def default_breadcrumb; end
+
   def show_local_breadcrumb
-    true
+    false
   end
 
   def check_user_limit

@@ -43,12 +43,17 @@ module WorkPackages
 
         menu_item(
           title: I18n.t("js.work_packages.default_queries.#{query_key}"),
-          query_params: params
+          query_params: params,
+          show_enterprise_icon: params[:show_enterprise_icon].present?
         )
       end
     end
 
     def query_path(query_params)
+      if query_params[:show_enterprise_icon].present?
+        return ee_upsale_path(query_params)
+      end
+
       if project.present?
         return report_project_work_packages_path(project, { name: query_params[:name] }) if query_params[:name] == :summary
 
@@ -69,6 +74,10 @@ module WorkPackages
       query_params[:work_package_default] &&
         (%i[filters query_props query_id name].none? { |k| params.key? k }) &&
         params[:on_work_package_path] == "true"
+    end
+
+    def ee_upsale_path(query_params)
+      share_upsale_work_packages_path({ name: query_params[:name] })
     end
 
     def check_for_redirected_urls(query_params)

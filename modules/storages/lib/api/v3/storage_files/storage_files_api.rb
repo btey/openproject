@@ -37,6 +37,9 @@ module API::V3::StorageFiles
 
     helpers do
       def validate_upload_request(body)
+        if Storages::Storage::one_drive_without_ee_token?(@storage.provider_type)
+          raise API::Errors::EnterpriseTokenMissing.new
+        end
 
         case body.transform_keys(&:to_sym)
         in { projectId: project_id, fileName: file_name, parent: parent }

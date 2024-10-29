@@ -74,6 +74,30 @@ module OpenProject
 
         def static_links
           {
+            upsale: {
+              href: "https://www.openproject.org/enterprise-edition",
+              label: "homescreen.links.upgrade_enterprise_edition"
+            },
+            upsale_benefits_features: {
+              href: "https://www.openproject.org/enterprise-edition/#premium-features",
+              label: "noscript_learn_more"
+            },
+            upsale_benefits_installation: {
+              href: "https://www.openproject.org/enterprise-edition/#installation",
+              label: "noscript_learn_more"
+            },
+            upsale_benefits_security: {
+              href: "https://www.openproject.org/enterprise-edition/#security-features",
+              label: "noscript_learn_more"
+            },
+            upsale_benefits_support: {
+              href: "https://www.openproject.org/enterprise-edition/#professional-support",
+              label: "noscript_learn_more"
+            },
+            upsale_get_quote: {
+              href: "https://www.openproject.org/request-quote/",
+              label: "admin.enterprise.get_quote"
+            },
             user_guides: {
               href: "https://www.openproject.org/docs/user-guide/",
               label: "homescreen.links.user_guides"
@@ -126,7 +150,11 @@ module OpenProject
               label: "homescreen.links.forums"
             },
             enterprise_support_as_community: {
-              href: 'https://www.openproject.org/pricing/#support',
+              href: "https://www.openproject.org/pricing/#support",
+              label: :label_enterprise_support
+            },
+            enterprise_support: {
+              href: "https://www.openproject.org/docs/enterprise-guide/support/",
               label: :label_enterprise_support
             },
             website: {

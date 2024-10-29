@@ -453,17 +453,17 @@ module Settings
       # Allow connections for trial creation and booking
       enterprise_trial_creation_host: {
         description: "Host for EE trial service",
-        default: "",
+        default: "https://start.openproject.com",
         writable: false
       },
       enterprise_chargebee_site: {
         description: "Site name for EE trial service",
-        default: "",
+        default: "openproject-enterprise",
         writable: false
       },
       enterprise_plan: {
         description: "Default EE selected plan",
-        default: "",
+        default: "enterprise-on-premises---euro---1-year",
         writable: false
       },
       feeds_enabled: {
@@ -1165,9 +1165,9 @@ module Settings
       },
       work_package_list_default_highlighting_mode: {
         format: :string,
-        default: "inline",
-        writable: true,
-        allowed: -> { Query::QUERY_HIGHLIGHTING_MODES.map(&:to_s) }
+        default: -> { EnterpriseToken.allows_to?(:conditional_highlighting) ? "inline" : "none" },
+        allowed: -> { Query::QUERY_HIGHLIGHTING_MODES.map(&:to_s) },
+        writable: -> { EnterpriseToken.allows_to?(:conditional_highlighting) }
       },
       work_package_list_default_columns: {
         default: %w[id subject type status assigned_to priority],

@@ -28,6 +28,9 @@
 
 module UserPreferences
   class ParamsContract < ::ParamsContract
+    include RequiresEnterpriseGuard
+    self.enterprise_action = :date_alerts
+    self.enterprise_condition = ->(*) { date_alerts_set? }
 
     DATE_ALERT_DURATIONS = [nil, 0, 1, 3, 7].freeze
     DATE_ALERT_OVERDUE_DURATIONS = [nil, 1, 3, 7].freeze

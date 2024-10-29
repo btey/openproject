@@ -56,6 +56,11 @@ module LdapGroups
       entries.each do |login, data|
         next if existing[login]
 
+        if OpenProject::Enterprise.user_limit_reached?
+          Rails.logger.error("[LDAP groups] User '#{login}' could not be created as user limit exceeded.")
+          break
+        end
+
         try_to_create(data)
       end
     end
