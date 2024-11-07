@@ -1,231 +1,45 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# GitHub recommends pinning actions to a commit SHA.
-# To get a newer version, you will need to update the SHA.
-# You can also reference a tag or branch, but the action may change without warning.
-
-name: Create and publish a Docker image (for develop)
+name: Build Docker Image
 
 on:
   push:
-    branches: ['develop']
-
-permissions:
-  contents: read # to fetch code (actions/checkout)
+    branches:
+      - develop  # or specify the branch you want to build on
 
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  setup:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      
     steps:
-      - name: Extract version
-        id: extract_version
-        run: |
-          if [[ ${{ github.event_name }} == 'push' ]]; then
-            TAG_REF=${GITHUB_REF#refs/tags/}
-            CHECKOUT_REF=$GITHUB_REF
-          elif [[ ${{ github.event_name }} == 'schedule' ]]; then
-            TAG_REF=dev
-            CHECKOUT_REF=refs/heads/dev
-          elif [[ ${{ github.event_name }} == 'workflow_dispatch' ]]; then
-            TAG_REF=${{ inputs.tag }}
-            CHECKOUT_REF=${{ inputs.tag }}
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-            if [ -z "$TAG_REF" ]; then
-              TAG_REF=dev
-              CHECKOUT_REF=dev
-            fi
-          else
-            echo "Unsupported event"
-            exit 1
-          fi
-
-          if [ -z "$TAG_REF" ] || [ -z "$CHECKOUT_REF" ]; then
-            echo "No TAG_REF or CHECKOUT_REF set. Aborting"
-            exit 1
-          fi
-
-          VERSION=${TAG_REF#v}
-          echo "Version: $VERSION"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-          echo "checkout_ref=$CHECKOUT_REF" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@v4
-      - name: Cache NPM
-        uses: runs-on/cache@v4
-        with:
-          path: |
-            frontend/node_modules
-            node_modules
-          key: nodejs-x64-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: nodejs-x64-
-      - name: Cache angular
-        uses: runs-on/cache@v4
-        with:
-          path: frontend/.angular
-          key: angular-${{ github.ref }}
-          restore-keys: angular-
-      - uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            frontend/package-lock.json
-      - name: Precompile assets
-        run: |
-          ./docker/prod/setup/precompile-assets.sh
-          # public/assets will be saved as artifact, so temporarily copying config file there as well
-          cp config/frontend_assets.manifest.json public/assets/frontend_assets.manifest.json
-      - uses: actions/upload-artifact@v4
-        with:
-          path: public/
-          name: public-assets-${{ github.sha }}
-          overwrite: true
-          # Since v4.4, hidden files are excluded by default.
-          # We need to include public/assets/.sprockets-manifest-*.json
-          include-hidden-files: true
-    outputs:
-      version: ${{ steps.extract_version.outputs.version }}
-      checkout_ref: ${{ steps.extract_version.outputs.checkout_ref }}
-  build-and-push-image:
-    needs:
-      - setup
-    if: github.repository == 'btey/openproject'
-    runs-on:
-      labels:
-        - runs-on
-        - ssh=false
-        - run-id=${{ github.run_id }}
-        - ${{ matrix.runner }}
-    strategy:
-      matrix:
-        include:
-          - platform: linux/amd64
-            digest: amd64-slim
-            bim_support: true
-            target: slim
-            runner: runner=4cpu-linux-x64
-          - platform: linux/arm64/v8
-            digest: arm64-slim
-            bim_support: false
-            target: slim
-            runner: runner=4cpu-linux-arm64
-          - platform: linux/amd64
-            digest: amd64-aio
-            bim_support: true
-            target: all-in-one
-            runner: runner=4cpu-linux-x64
-          - platform: linux/arm64/v8
-            digest: arm64-aio
-            bim_support: false
-            target: all-in-one
-            runner: runner=4cpu-linux-arm64
-          - platform: linux/ppc64le
-            digest: ppc-aio
-            bim_support: false
-            target: all-in-one
-            runner: runner=4cpu-linux-x64
-    steps:
-      - name: Checkout
-        with:
-          ref: ${{ needs.setup.outputs.checkout_ref }}
-        uses: actions/checkout@v4
-      - name: Prepare docker files
-        run: |
-          cp ./docker/prod/Dockerfile ./Dockerfile
-      - name: Download precompiled public assets
-        uses: actions/download-artifact@v4
-        with:
-          name: public-assets-${{ github.sha }}
-          path: public/
-      - name: Setup precompiled assets
-        run: |
-          ls -al public/
-          mv public/assets/frontend_assets.manifest.json config/frontend_assets.manifest.json
-          ls -al config/frontend_assets.manifest.json
-          # allow precompiled assets to be injected into docker image
-          echo '' >> .dockerignore
-          echo '!/public/assets' >> .dockerignore
-          echo '!/config/frontend_assets.manifest.json' >> .dockerignore
-      - name: Add build information
-        run: |
-          echo "${{ needs.setup.outputs.checkout_ref }}" > PRODUCT_VERSION
-          echo "https://github.com/btey/openproject/commits/${{ needs.setup.outputs.checkout_ref }}" > PRODUCT_URL
-          date -u +"%Y-%m-%dT%H:%M:%SZ" > RELEASE_DATE
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Docker meta
+      - name: Extract metadata (tags, labels) for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
-          context: git
-          labels: |
-            io.artifacthub.package.readme-url=https://raw.githubusercontent.com/btey/openproject/refs/heads/dev/docker/prod/README.md
-            io.artifacthub.package.logo-url=https://raw.githubusercontent.com/opf/openproject/refs/heads/dev/docker/prod/logo.png
-            org.opencontainers.image.source=https://github.com/btey/openproject
-            org.opencontainers.image.documentation=https://www.openproject.org/docs/installation-and-operations/installation/
-            org.opencontainers.image.vendor=OpenProject GmbH
-          tags: |
-            type=semver,pattern={{version}},value=${{ needs.setup.outputs.version }}
-          images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Build image
-        id: build
-        uses: docker/build-push-action@v6
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: ${{ matrix.platform }}
-          target: ${{ matrix.target }}
-          build-args: |
-            BIM_SUPPORT=${{ matrix.bim_support }}
-          pull: true
-          load: true
+          file: docker/prod/Dockerfile
+          platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-      - name: Test
-        # We only test the native container. If that fails the builds for the others
-        # will be cancelled as well.
-        if: matrix.platform == 'linux/amd64' && matrix.target == 'all-in-one'
-        run: |
-          docker run \
-            --name openproject \
-            -d -p 8080:80 --platform ${{ matrix.platform }} \
-            -e SUPERVISORD_LOG_LEVEL=debug \
-            -e OPENPROJECT_LOGIN__REQUIRED=false \
-            -e OPENPROJECT_HTTPS=false \
-            ${{ steps.build.outputs.imageid }}
-
-          sleep 60
-
-          docker logs openproject --tail 100
-          wget -O- --retry-on-http-error=503,502 --retry-connrefused http://localhost:8080/api/v3
-      - name: Push image
-        id: push
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          platforms: ${{ matrix.platform }}
-          target: ${{ matrix.target }}
-          build-args: |
-            BIM_SUPPORT=${{ matrix.bim_support }}
-          labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
-
+          push: true  # Set to true if you want to push the image to Docker Hub
