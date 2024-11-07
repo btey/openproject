@@ -86,6 +86,7 @@ jobs:
           npm install
       - name: Precompile assets
         run: |
+          bundle install
           ./docker/prod/setup/precompile-assets.sh
           # public/assets will be saved as artifact, so temporarily copying config file there as well
           cp config/frontend_assets.manifest.json public/assets/frontend_assets.manifest.json
