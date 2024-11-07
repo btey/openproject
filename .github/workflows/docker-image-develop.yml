@@ -56,30 +56,34 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "checkout_ref=$CHECKOUT_REF" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
-      - name: Cache NPM
-        uses: runs-on/cache@v4
-        with:
-          path: |
-            frontend/node_modules
-            node_modules
-          key: nodejs-x64-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: nodejs-x64-
-      - name: Cache angular
-        uses: runs-on/cache@v4
-        with:
-          path: frontend/.angular
-          key: angular-${{ github.ref }}
-          restore-keys: angular-
+      # - name: Cache NPM
+      #   uses: runs-on/cache@v4
+      #   with:
+      #     path: |
+      #       frontend/node_modules
+      #       node_modules
+      #     key: nodejs-x64-${{ hashFiles('**/package-lock.json') }}
+      #     restore-keys: nodejs-x64-
+      # - name: Cache angular
+      #   uses: runs-on/cache@v4
+      #   with:
+      #     path: frontend/.angular
+      #     key: angular-${{ github.ref }}
+      #     restore-keys: angular-
       - uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
+        # with:
+          # bundler-cache: true
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            frontend/package-lock.json
+          # cache: npm
+          # cache-dependency-path: |
+          #   package-lock.json
+          #   frontend/package-lock.json
+      - name: Install dependencies
+        run: |
+          npm install --prefix frontend
+          npm install
       - name: Precompile assets
         run: |
           ./docker/prod/setup/precompile-assets.sh
