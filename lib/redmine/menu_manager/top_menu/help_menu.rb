@@ -31,8 +31,8 @@ module Redmine::MenuManager::TopMenu::HelpMenu
     cache_key = ["help_top_menu_node",
                  OpenProject::Static::Links.links,
                  I18n.locale,
-                 OpenProject::Static::Links.help_link,
-                 EnterpriseToken.active?]
+                 OpenProject::Static::Links.help_link]
+
     OpenProject::Cache.fetch(cache_key) do
       if OpenProject::Static::Links.help_link_overridden?
         content_tag("li",
@@ -88,10 +88,6 @@ module Redmine::MenuManager::TopMenu::HelpMenu
                   class: "op-menu--headline",
                   title: I18n.t("top_menu.help_and_support")
     end
-    if EnterpriseToken.show_banners?
-      result << static_link_item(:upsale,
-                                 href_suffix: "/?utm_source=unknown&utm_medium=op-instance&utm_campaign=ee-upsale-help-menu")
-    end
     result << static_link_item(:user_guides)
     result << content_tag(:li, class: "op-menu--item") do
       link_to I18n.t("label_videos"),
@@ -102,12 +98,7 @@ module Redmine::MenuManager::TopMenu::HelpMenu
     end
     result << static_link_item(:shortcuts)
     result << static_link_item(:forums)
-    enterprise_support_link_key = if EnterpriseToken.active?
-                                    :enterprise_support
-                                  else
-                                    :enterprise_support_as_community
-                                  end
-    result << static_link_item(enterprise_support_link_key)
+    result << static_link_item(:enterprise_support_as_community)
     result << content_tag(:hr, "", class: "op-menu--separator")
   end
 

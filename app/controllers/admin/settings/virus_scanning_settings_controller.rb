@@ -30,7 +30,6 @@ module Admin::Settings
   class VirusScanningSettingsController < ::Admin::SettingsController
     menu_item :attachments
 
-    before_action :require_ee
     before_action :check_clamav, only: %i[update], if: -> { scan_enabled? }
 
     def show_local_breadcrumb
@@ -50,10 +49,6 @@ module Admin::Settings
     end
 
     private
-
-    def require_ee
-      render("upsale") unless EnterpriseToken.allows_to?(:virus_scanning)
-    end
 
     def mark_unscanned_attachments
       @unscanned_attachments = Attachment.status_uploaded

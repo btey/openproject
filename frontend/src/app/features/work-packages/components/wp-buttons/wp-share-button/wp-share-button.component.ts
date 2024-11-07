@@ -34,7 +34,6 @@ import { OpModalService } from 'core-app/shared/components/modal/modal.service';
 import {
   WorkPackageShareModalComponent,
 } from 'core-app/features/work-packages/components/wp-share-modal/wp-share.modal';
-import { BannersService } from 'core-app/core/enterprise/banners.service';
 import { ApiV3FilterBuilder } from 'core-app/shared/helpers/api-v3/api-v3-filter-builder';
 import { ApiV3Service } from 'core-app/core/apiv3/api-v3.service';
 import { filter, map, startWith, switchMap } from 'rxjs/operators';
@@ -52,8 +51,6 @@ import { CollectionResource } from 'core-app/features/hal/resources/collection-r
 export class WorkPackageShareButtonComponent extends UntilDestroyedMixin implements OnInit {
   @Input() public workPackage:WorkPackageResource;
 
-  showEnterpriseIcon = this.bannersService.eeShowBanners;
-
   shareCount$:Observable<number>;
 
   public text = {
@@ -64,7 +61,6 @@ export class WorkPackageShareButtonComponent extends UntilDestroyedMixin impleme
     readonly I18n:I18nService,
     readonly opModalService:OpModalService,
     readonly cdRef:ChangeDetectorRef,
-    readonly bannersService:BannersService,
     readonly apiV3Service:ApiV3Service,
     readonly actions$:ActionsService,
   ) {

@@ -36,8 +36,6 @@ class Queries::Projects::Selects::CustomField < Queries::Selects::Base
   end
 
   def self.all_available
-    return [] unless available?
-
     ProjectCustomField
       .visible
       .pluck(:id)

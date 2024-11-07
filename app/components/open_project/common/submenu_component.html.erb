@@ -36,10 +36,6 @@
               <% end %>
               <span class="op-submenu--item-title">
                 <%= menu_item.title %>
-
-                <% if menu_item.show_enterprise_icon %>
-                  <%= render Primer::Beta::Octicon.new(icon: "op-enterprise-addons", "aria-label": I18n.t(:label_enterprise_edition), classes: "upsale-colored", ml: 2) %>
-                <% end %>
               </span>
 
               <% if menu_item.count %>
@@ -76,10 +72,6 @@
                 <% end %>
                 <span class="op-submenu--item-title">
                   <%= child_item.title %>
-
-                  <% if child_item.show_enterprise_icon %>
-                    <%= render Primer::Beta::Octicon.new(icon: "op-enterprise-addons", "aria-label": I18n.t(:label_enterprise_edition), classes: "upsale-colored", ml: 2) %>
-                  <% end %>
 
                   <% if child_item.favored %>
                     <%= render Primer::Beta::Octicon.new(icon: "star-fill", "aria-label": I18n.t(:label_favorite), classes: %w[op-submenu--item-mark op-primer--star-icon], ml: 2) %>

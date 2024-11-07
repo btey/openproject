@@ -48,7 +48,6 @@ class Storages::Admin::StoragesController < ApplicationController
                 only: %i[show_oauth_application destroy edit edit_host confirm_destroy update
                          change_health_notifications_enabled replace_oauth_application]
   before_action :ensure_valid_provider_type_selected, only: %i[select_provider]
-  before_action :require_ee_token_for_one_drive, only: %i[select_provider]
 
   menu_item :external_file_storages
 
@@ -77,8 +76,6 @@ class Storages::Admin::StoragesController < ApplicationController
 
     respond_with_turbo_streams(&:html)
   end
-
-  def upsale; end
 
   def select_provider
     @object = Storages::Storage.new(provider_type: @provider_type)
@@ -300,9 +297,4 @@ class Storages::Admin::StoragesController < ApplicationController
     end
   end
 
-  def require_ee_token_for_one_drive
-    if ::Storages::Storage::one_drive_without_ee_token?(@provider_type)
-      redirect_to action: :upsale
-    end
-  end
 end

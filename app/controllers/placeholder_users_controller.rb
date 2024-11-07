@@ -27,7 +27,6 @@
 #++
 
 class PlaceholderUsersController < ApplicationController
-  include EnterpriseTrialHelper
   layout "admin"
   before_action :authorize_global, except: %i[show]
   no_authorization_required! :show

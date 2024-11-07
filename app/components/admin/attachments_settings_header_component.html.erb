@@ -39,10 +39,9 @@ See COPYRIGHT and LICENSE files for more details.
       tab.with_text { t("settings.general") }
     end
     tab_nav.with_tab(selected: @selected == 2, href: admin_settings_virus_scanning_path) do |tab|
-      tab.with_icon(icon: :"op-enterprise-addons") unless EnterpriseToken.allows_to?("virus_scanning")
       tab.with_text { t(:"settings.antivirus.title") }
     end
-    if User.current.admin? && (EnterpriseToken.allows_to?(:virus_scanning) || Attachment.status_quarantined.any?)
+    if User.current.admin? && Attachment.status_quarantined.any?
       tab_nav.with_tab(selected: @selected == 3, href: admin_quarantined_attachments_path) do |tab|
         tab.with_text { t(:"antivirus_scan.quarantined_attachments.title") }
       end

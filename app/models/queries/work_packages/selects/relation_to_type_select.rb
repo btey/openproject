@@ -44,9 +44,7 @@ class Queries::WorkPackages::Selects::RelationToTypeSelect < Queries::WorkPackag
   end
 
   def self.instances(context = nil)
-    if !granted_by_enterprise_token
-      []
-    elsif context
+    if context
       context.types
     else
       Type.all

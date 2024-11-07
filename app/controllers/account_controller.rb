@@ -31,7 +31,6 @@ class AccountController < ApplicationController
   include OmniauthHelper
   include Accounts::Registration
   include Accounts::UserConsent
-  include Accounts::UserLimits
   include Accounts::UserLogin
   include Accounts::UserPasswordChange
 
@@ -220,7 +219,6 @@ class AccountController < ApplicationController
   end
 
   def activate_self_registered(token)
-    return if enforce_activation_user_limit(user: token.user)
 
     user = token.user
 
@@ -244,7 +242,6 @@ class AccountController < ApplicationController
   end
 
   def activate_by_invite_token(token)
-    return if enforce_activation_user_limit(user: token.user)
 
     activate_invited token
   end
@@ -325,8 +322,6 @@ class AccountController < ApplicationController
 
   def self_registration!
     @user = assign_user_attributes({ admin: false, status: User.statuses[:registered] }) if @user.nil?
-
-    return if enforce_activation_user_limit(user: user_with_email(@user))
 
     # Set consent if received from registration form
     if consent_param?

@@ -68,10 +68,6 @@ module Storages::Storages
       end
     end
 
-    def require_ee_token_for_one_drive
-      if ::Storages::Storage.one_drive_without_ee_token?(provider_type)
-        errors.add(:base, I18n.t("api_v3.errors.code_500_missing_enterprise_token"))
-      end
-    end
+
   end
 end

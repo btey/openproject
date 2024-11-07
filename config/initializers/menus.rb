@@ -540,12 +540,6 @@ Redmine::MenuManager.map :admin_menu do |menu|
             caption: :label_color_plural,
             icon: "meter"
 
-  menu.push :enterprise,
-            { controller: "/enterprises", action: :show },
-            caption: :label_enterprise_edition,
-            icon: "op-enterprise-addons",
-            if: proc { User.current.admin? && OpenProject::Configuration.ee_manager_visible? }
-
   menu.push :admin_costs,
             { controller: "/admin/settings", action: "show_plugin", id: :costs },
             if: Proc.new { User.current.admin? },

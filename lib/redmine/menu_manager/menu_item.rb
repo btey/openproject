@@ -37,8 +37,7 @@ class Redmine::MenuManager::MenuItem < Redmine::MenuManager::TreeNode
               :child_menus,
               :last,
               :partial,
-              :engine,
-              :enterprise_feature
+              :engine
 
   # rubocop:disable Metrics/AbcSize
   # rubocop:disable Metrics/PerceivedComplexity
@@ -58,7 +57,6 @@ class Redmine::MenuManager::MenuItem < Redmine::MenuManager::TreeNode
     @param = options[:param] || :project_id
     @icon = options[:icon]
     @icon_after = options[:icon_after]
-    @enterprise_feature = options[:enterprise_feature]
     @caption = options[:caption]
     @context = options[:context]
     @html_options = options[:html].nil? ? {} : options[:html].dup

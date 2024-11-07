@@ -34,7 +34,7 @@ See COPYRIGHT and LICENSE files for more details.
                               data: {
                                 'members-form-target': 'addMemberForm',
                                 controller: "user-limit",
-                                'user-limit-open-seats-value': OpenProject::Enterprise.open_seats_count,
+                                'user-limit-open-seats-value': 999999,
                                 'user-limit-member-autocompleter-value': true,
                                 'application-target': "dynamic",
                               }) do |f| %>
@@ -99,14 +99,4 @@ See COPYRIGHT and LICENSE files for more details.
         </div>
       </div>
     </div>
-
-  <% if OpenProject::Enterprise.user_limit.present? %>
-        <div class="op-toast -warning icon-warning d-none"
-             data-user-limit-target="limitWarning">
-          <div class="op-toast--content">
-            <p><%= I18n.t("warning_user_limit_reached#{'_admin' if current_user.admin?}", upgrade_url: OpenProject::Enterprise.upgrade_url).html_safe %></p>
-          </div>
-        </div>
-    <% end %>
-
 <% end %>

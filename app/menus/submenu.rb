@@ -92,19 +92,17 @@ class Submenu
     { query_id: id }
   end
 
-  def menu_item(title:, icon_key: nil, count: nil, show_enterprise_icon: false, query_params: {})
+  def menu_item(title:, icon_key: nil, count: nil, query_params: {})
     OpenProject::Menu::MenuItem.new(title:,
                                     href: query_path(query_params),
                                     icon: icon_map.fetch(icon_key, icon_key),
                                     count:,
                                     selected: selected?(query_params),
-                                    favored: favored?(query_params),
-                                    show_enterprise_icon:)
+                                    favored: favored?(query_params))
   end
 
   def selected?(query_params)
     query_params.each_key do |filter_key|
-      next if filter_key == :show_enterprise_icon
       if params[filter_key] != query_params[filter_key].to_s
         return false
       end

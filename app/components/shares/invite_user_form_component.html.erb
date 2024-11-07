@@ -28,29 +28,6 @@
             end
           end
 
-          if OpenProject::Enterprise.user_limit.present?
-            invite_form.with_area('userLimitWarning',
-                                  data: { 'user-limit-target': 'limitWarning',
-                                          'test-selector': 'op-share-dialog-user-limit' },
-                                  display: :none) do
-              flex_layout do |user_limit_row|
-                user_limit_row.with_column(mr: 2) do
-                  render(Primer::Beta::Octicon.new(icon: :'alert-fill', color: :danger))
-                end
-
-                user_limit_row.with_column do
-                  render(Primer::Beta::Text.new(color: :danger)) do
-                    I18n.t(
-                      "sharing.warning_user_limit_reached#{'_admin' if User.current.admin?}",
-                      upgrade_url: OpenProject::Enterprise.upgrade_url,
-                      entity: entity.model_name.human
-                    ).html_safe
-                  end
-                end
-              end
-            end
-          end
-
           invite_form.with_area('userSelectedWarning',
                                 data: { 'shares--user-selected-target': 'error',
                                         'test-selector': 'op-share-dialog-no-user-selected' },

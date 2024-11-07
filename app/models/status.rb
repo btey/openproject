@@ -64,11 +64,6 @@ class Status < ApplicationRecord
     order(:position)
   end
 
-  def self.can_readonly?
-    EnterpriseToken.allows_to?(:readonly_work_packages)
-  end
-  delegate :can_readonly?, to: :class
-
   def <=>(other)
     position <=> other.position
   end
@@ -76,8 +71,6 @@ class Status < ApplicationRecord
   def to_s; name end
 
   def is_readonly
-    return false unless can_readonly?
-
     super
   end
   alias :is_readonly? :is_readonly
@@ -85,7 +78,7 @@ class Status < ApplicationRecord
   ##
   # Overrides cache key so that changes to EE state are reflected
   def cache_key
-    super + "/" + can_readonly?.to_s
+    super
   end
 
   private
