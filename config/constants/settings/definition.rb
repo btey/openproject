@@ -1166,8 +1166,8 @@ module Settings
       work_package_list_default_highlighting_mode: {
         format: :string,
         default: "inline",
-        writable: true,
-        allowed: -> { Query::QUERY_HIGHLIGHTING_MODES.map(&:to_s) }
+        allowed: -> { Query::QUERY_HIGHLIGHTING_MODES.map(&:to_s) },
+        writable: true
       },
       work_package_list_default_columns: {
         default: %w[id subject type status assigned_to priority],
