@@ -42,8 +42,7 @@ module OpenProject
       end
 
       def user_limit
-
-        999999
+        Hash(token.restrictions)[:active_user_count] if token
       end
 
       def active_user_count

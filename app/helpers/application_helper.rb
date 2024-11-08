@@ -243,7 +243,7 @@ module ApplicationHelper
       css << ("action-#{action_name}")
     end
 
-    css << "ee-banners-hidden"
+    css << "ee-banners-#{EnterpriseToken.show_banners? ? 'visible' : 'hidden'}"
 
     css << "env-#{Rails.env}"
 

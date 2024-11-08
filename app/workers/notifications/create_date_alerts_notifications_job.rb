@@ -36,6 +36,7 @@ module Notifications
     )
 
     def perform(user)
+      return unless EnterpriseToken.allows_to?(:date_alerts)
 
       Service
         .new(user)

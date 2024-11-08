@@ -67,6 +67,8 @@ module Query::Highlighting
     end
 
     def highlighted_attributes
+      return [] unless EnterpriseToken.allows_to?(:conditional_highlighting)
+
       val = super
 
       if val.present?
@@ -77,6 +79,8 @@ module Query::Highlighting
     end
 
     def highlighting_mode
+      return :none unless EnterpriseToken.allows_to?(:conditional_highlighting)
+
       val = super
 
       if val.present?

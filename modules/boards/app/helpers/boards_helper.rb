@@ -4,11 +4,12 @@ module BoardsHelper
   BoardTypeAttributes = Struct.new(:radio_button_value,
                                    :title,
                                    :description,
-                                   :image_path)
+                                   :image_path,
+                                   :disabled?)
 
   def board_types
     [
-      build_board_type_attributes("basic", "lists"),
+      build_board_type_attributes("basic", "lists", false),
       build_board_type_attributes("status", "status"),
       build_board_type_attributes("assignee", "assignees"),
       build_board_type_attributes("version", "version"),
@@ -17,11 +18,12 @@ module BoardsHelper
     ]
   end
 
-  def build_board_type_attributes(type_name, image_name)
+  def build_board_type_attributes(type_name, image_name, disabled = !EnterpriseToken.allows_to?(:board_view))
     BoardTypeAttributes.new(type_name,
                             I18n.t("boards.board_type_attributes.#{type_name}"),
                             I18n.t("boards.board_type_descriptions.#{type_name}"),
-                            "assets/images/board_creation_modal/#{image_name}.svg")
+                            "assets/images/board_creation_modal/#{image_name}.svg",
+                            disabled)
   end
 
   def global_board_create_context?

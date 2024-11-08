@@ -36,6 +36,7 @@ class Queries::Notifications::Filters::ReasonFilter < Queries::Notifications::Fi
 
   def allowed_values
     reasons = REASONS.keys
+    reasons = reasons.without("dateAlert") unless EnterpriseToken.allows_to?(:date_alerts)
     reasons.map { |reason| [reason, reason] }
   end
 

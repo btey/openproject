@@ -4,6 +4,7 @@ module OpenIDConnect
     menu_item :plugin_openid_connect
 
     before_action :require_admin
+    before_action :check_ee
     before_action :find_provider, only: %i[edit update destroy]
 
     def index; end
@@ -52,6 +53,13 @@ module OpenIDConnect
     end
 
     private
+
+    def check_ee
+      unless EnterpriseToken.allows_to?(:openid_providers)
+        render template: "/openid_connect/providers/upsale"
+        false
+      end
+    end
 
     def create_params
       params

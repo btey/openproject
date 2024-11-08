@@ -100,7 +100,11 @@ module SharingStrategies
     end
 
     def modal_body_component(errors)
-      super
+      if EnterpriseToken.allows_to?(:work_package_sharing)
+        super
+      else
+        Shares::WorkPackages::ModalUpsaleComponent.new
+      end
     end
 
     def title

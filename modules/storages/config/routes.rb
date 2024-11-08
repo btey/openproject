@@ -68,6 +68,8 @@ Rails.application.routes.draw do
           get :confirm_destroy
           delete :replace_oauth_application
         end
+
+        get :upsale, on: :collection
       end
     end
   end
