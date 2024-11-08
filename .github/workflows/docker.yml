@@ -4,15 +4,13 @@ on:
   push:
     branches:
       - develop  # or specify the branch you want to build on
-
-  push:
     tags:
       - v*
-  workflow_dispatch:
-    inputs:
-      tag:
-        description: "The tag to release. Note that this happens by default on the tag push. Only run this action when something went wrong!"
-        required: false
+  # workflow_dispatch:
+  #   inputs:
+  #     tag:
+  #       description: "The tag to release. Note that this happens by default on the tag push. Only run this action when something went wrong!"
+  #       required: false
 
 permissions:
   contents: read # to fetch code (actions/checkout)
