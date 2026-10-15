@@ -45,6 +45,12 @@ See COPYRIGHT and LICENSE files for more details.
   end
 %>
 
+<% unless omniauth_configured %>
+  <%= render(Primer::Alpha::Banner.new(scheme: :warning, mb: 3)) do %>
+    <%= t("settings.authentication.password_login_requires_sso_provider") %>
+  <% end %>
+<% end %>
+
 <%
   environment_configured_settings = [
     (I18n.t(:setting_password_login) unless Setting.password_login_writable?),

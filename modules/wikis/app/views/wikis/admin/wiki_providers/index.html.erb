@@ -60,6 +60,4 @@ See COPYRIGHT and LICENSE files for more details.
       end %>
 <% end %>
 
-<% if @wiki_providers.any? %>
-  <%= render(Wikis::Admin::WikiProviderListComponent.new(@wiki_providers)) %>
-<% end %>
+<%= render(Wikis::Admin::WikiProviderListComponent.new(@wiki_providers)) %>

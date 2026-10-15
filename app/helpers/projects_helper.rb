@@ -106,7 +106,5 @@ module ProjectsHelper
 
   def portfolio_management_feature_required? = params[:workspace_type].in?(%w[portfolio program])
 
-  def portfolio_management_feature_missing?
-    portfolio_management_feature_required?
-  end
+  def portfolio_management_feature_missing? = false
 end

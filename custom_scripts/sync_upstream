@@ -23,17 +23,17 @@
 # were conflicts.
 #
 # Usage:
-#   script/sync_upstream <from_tag> <to_tag> [remote]
+#   custom_scripts/sync_upstream <from_tag> <to_tag> [remote]
 #
 # Example:
-#   script/sync_upstream v17.5.1 v17.6.0
-#   script/sync_upstream v17.5.1 v17.6.0 upstream
+#   custom_scripts/sync_upstream v17.5.1 v17.6.0
+#   custom_scripts/sync_upstream v17.5.1 v17.6.0 upstream
 #
 # After the script stops:
 #   1. Resolve any conflicts (look for <<<<<<< markers) and `git add` them
 #   2. Review the full staged diff, tweak anything needed, `git add` again
 #   3. git commit
-#   4. script/sync_upstream --cleanup   # removes the temporary graft
+#   4. custom_scripts/sync_upstream --cleanup   # removes the temporary graft
 
 set -euo pipefail
 
@@ -116,13 +116,13 @@ if git merge --no-commit --no-ff "$TO_TAG"; then
   echo "==> Merge applied cleanly (no conflicts), but NOT committed."
   echo "    Review the staged changes, tweak if needed, then run:"
   echo "      git commit -m \"Merge upstream $TO_TAG\""
-  echo "      script/sync_upstream --cleanup"
+  echo "      custom_scripts/sync_upstream --cleanup"
 else
   echo
   echo "==> Merge stopped with conflicts. Resolve them, then run:"
   echo "      git add <resolved files>"
   echo "      # review the rest of the staged diff, tweak if needed"
   echo "      git commit -m \"Merge upstream $TO_TAG\""
-  echo "      script/sync_upstream --cleanup"
+  echo "      custom_scripts/sync_upstream --cleanup"
   exit 1
 fi
