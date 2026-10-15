@@ -1,0 +1,68 @@
+# Invariants: assertions about OUR customizations that must hold after every upstream merge.
+# Columns (TAB separated): id <TAB> file <TAB> mode <TAB> regex (Python re, DOTALL, MULTILINE) <TAB> why
+# mode: present = regex must match the file | absent = regex must NOT match the file
+# Consumed by `custom_scripts/enterprise_audit.py verify`. Add a row whenever you add a customization (see CUSTOMIZATIONS_REGISTRY.md).
+CFG_HIDE_BANNERS	config/constants/settings/definition.rb	present	ee_hide_banners:\s*\{[^}]*default:\s*true	Banners hidden by default
+CFG_TRIAL_HOST	config/constants/settings/definition.rb	present	enterprise_trial_creation_host:\s*\{[^}]*default:\s*""	No outbound calls to the EE trial service
+CFG_CHARGEBEE	config/constants/settings/definition.rb	present	enterprise_chargebee_site:\s*\{[^}]*default:\s*""	No Chargebee site
+CFG_PLAN	config/constants/settings/definition.rb	present	enterprise_plan:\s*\{[^}]*default:\s*""	No default EE plan
+CFG_CAPTURE_LINKS	config/constants/settings/definition.rb	absent	writable:\s*->\s*\{\s*EnterpriseToken	capture_external_links settings writable
+ENT_USER_LIMIT	lib/open_project/enterprise.rb	present	def user_limit\s+999999	User limit patched to effectively unlimited
+HELPERS_TRIAL_HOST	lib_static/open_project/configuration/helpers.rb	absent	start\.openproject	Trial host not hardcoded
+APP_HELPER_BANNERS	app/helpers/application_helper.rb	absent	if EnterpriseToken\.hide_banners\?	Banner-hiding CSS class always set
+PHASE_DEF_HELPER	app/controllers/concerns/projects/phase_definition_helper.rb	present	def allowed_to_customize_life_cycle\?\s+true	Project life cycle customization always allowed
+BASE_STRATEGY	app/models/sharing_strategies/base_strategy.rb	present	def feature_available\?\s+return true\s+end	Sharing always available
+STATUS_READONLY	app/models/status.rb	absent	can_readonly\?	Read-only work packages status always available
+TIMESTAMP_ALLOWED	app/models/timestamp.rb	absent	EnterpriseToken	Baseline comparison unrestricted
+INV_FORM_MODEL	app/models/users/Invitation/form_model.rb	absent	allows_to\?\(:placeholder_users\)	Placeholder users invitable
+WORKFLOW_ROLES	app/models/workflow.rb	absent	EnterpriseToken	Work package editor role always eligible
+CUSTOM_FIELD_FMT	lib/open_project/custom_field_format.rb	present	def available\?\s+enabled\?\s+end	Custom field formats not gated
+CF_FORMAT_INIT	config/initializers/custom_field_format.rb	absent	enterprise_feature	Hierarchy / weighted list / calculated value formats not gated
+CONTRACT_GUARD_NOOP	app/contracts/concerns/requires_enterprise_guard.rb	absent	validate\s+:has_enterprise	Contract guard neutralized
+APP_CTRL_NO_GUARD	app/controllers/application_controller.rb	absent	Accounts::EnterpriseGuard	guard_enterprise_feature macro not available
+ACCOUNT_NO_LIMIT	app/controllers/account_controller.rb	absent	Accounts::UserLimits|enforce_activation_user_limit	No user limit on activation
+USERS_NO_LIMIT	app/controllers/users_controller.rb	absent	enforce_user_limit|user_limit_reached	No user limit on create/activate
+USERS_CONTRACT_CREATE	app/contracts/users/create_contract.rb	absent	user_limit_not_exceeded	No user limit validation
+USERS_CONTRACT_UPDATE	app/contracts/users/update_contract.rb	absent	user_limit_not_exceeded	No user limit validation
+USERS_API_NO_LIMIT	lib/api/v3/users/users_api.rb	absent	ensure_user_limit_not_reached	No user limit in API
+MEMBER_HELPER	app/controllers/concerns/member_helper.rb	absent	enterprise_allow_new_users	Inviting new users not limited
+MEMBER_FORM_SEATS	app/views/members/_member_form.html.erb	present	user-limit-open-seats-value":\s*999999	Seat counter never blocks the member form
+VIRUS_ENABLED	app/models/setting/virus_scanning.rb	absent	EnterpriseToken	Virus scanning usable
+EXT_LINKS_FILTER	lib/open_project/text_formatting/filters/external_link_capture_filter.rb	absent	EnterpriseToken	External link capture usable
+EXT_LINKS_CTRL	app/controllers/external_link_warning_controller.rb	absent	EnterpriseToken	External link capture usable
+JOURNALIZED	app/models/work_package/journalized.rb	absent	EnterpriseToken	Internal comments usable
+CREATE_NOTE	app/contracts/work_packages/create_note_contract.rb	absent	EnterpriseToken	Internal comments usable
+MCP_API	lib/api/mcp.rb	absent	EnterpriseToken	MCP server usable
+SCIM_AUTH	config/initializers/scimitar.rb	absent	EnterpriseToken	SCIM API usable
+MENUS_NO_ENTERPRISE_ENTRY	config/initializers/menus.rb	absent	label_enterprise_edition	Admin 'Enterprise edition' menu entry removed
+MENUS_PORTFOLIO	config/initializers/menus.rb	absent	EnterpriseToken	Portfolios menu not gated
+HOMESCREEN_NO_UPSELL	config/initializers/homescreen.rb	absent	name:\s*"upsell"	Upsell homescreen block removed
+TIME_ENTRY	modules/costs/app/models/time_entry.rb	absent	EnterpriseToken	Time entry time restrictions usable
+AUTH_PLUGIN	modules/auth_plugins/lib/open_project/plugins/auth_plugin.rb	absent	EnterpriseToken	All SSO strategies enabled
+OIDC_CTRL	modules/openid_connect/app/controllers/openid_connect/providers_controller.rb	absent	check_ee	OIDC providers manageable
+SAML_CTRL	modules/auth_saml/app/controllers/saml/providers_controller.rb	absent	check_ee	SAML providers manageable
+STORAGES_BASE	modules/storages/app/models/storages/storage.rb	absent	enterprise_token	OneDrive/SharePoint/Nextcloud SSO storages usable
+TEAM_PLANNER_CTRL	modules/team_planner/app/controllers/team_planner/team_planner_controller.rb	absent	guard_enterprise_feature	Team planner usable
+WIKIS_CTRL	modules/wikis/app/controllers/wikis/admin/wiki_providers_controller.rb	absent	ee_token_allows	XWiki integration usable
+RESOURCE_MGMT_BASE	modules/resource_management/app/controllers/resource_management/base_controller.rb	absent	enterprise	Resource management usable
+LDAP_GROUPS_JOB	modules/ldap_groups/app/workers/ldap_groups/synchronization_job.rb	absent	EnterpriseToken	LDAP group sync runs
+LDAP_DEPT_JOB	modules/ldap_departments/app/workers/ldap_departments/synchronization_job.rb	absent	EnterpriseToken	LDAP department sync runs
+BACKLOGS_CONTRACT	modules/backlogs/app/contracts/backlogs/projects/backlog_settings_contract.rb	absent	EnterpriseToken	Sprint sharing / multiple active sprints usable
+MEETING_TEMPLATES	modules/meeting/app/controllers/meeting_templates_controller.rb	absent	enterprise	Meeting templates usable
+FE_BANNERS_ALLOWS	frontend/src/app/core/enterprise/banners.service.ts	present	public allowsTo\(feature:string\):boolean \{\s+return true;	Frontend allowsTo() always true
+FE_BANNERS_SHOW	frontend/src/app/core/enterprise/banners.service.ts	present	public showBannerFor\(feature:string\):boolean \{\s+return false;	Frontend never shows banners
+FE_CUSTOM_ACTIONS	frontend/src/app/features/work-packages/components/wp-custom-actions/wp-custom-actions.component.ts	present	available = true;	Custom actions buttons shown
+OIDC_SYNC_GROUPS_CAST	modules/openid_connect/app/services/openid_connect/configuration_mapper.rb	present	ActiveModel::Type::Boolean\.new\.cast\(options\["sync_groups"\]\)	CUSTOM: boolean cast for sync_groups from ENV
+OIDC_GROUP_FILTERS	modules/openid_connect/app/services/openid_connect/configuration_mapper.rb	present	"group_prefixes"\s*=>\s*options\["group_prefixes"\]	CUSTOM: ENV mapping for group_prefixes/regexes
+OIDC_ID_TOKEN_GROUPS	modules/openid_connect/lib/open_project/openid_connect/hooks/hook.rb	present	extract_groups_claim\(context, provider\)	CUSTOM: groups claim from ID token (Entra ID)
+MAILER_NEWS_SUBJECT	app/mailers/user_mailer.rb	present	"\[#\{@news\.project\.name\}\] "	CUSTOM: '[' prefix in news mail subjects
+GITLAB_ENGINE_CREATE_MR	modules/gitlab_integration/lib/open_project/gitlab_integration/engine.rb	present	CreateGitlabMergeRequestAPI	CUSTOM: create MR/issue endpoints mounted
+GITLAB_MR_HOOK_STATUS	modules/gitlab_integration/lib/open_project/gitlab_integration/notification_handler/merge_request_hook.rb	present	wp_status_id_on_new_mr = 483	CUSTOM: hardcoded status ids (483 in development, 488 merged)
+GITLAB_NOTE_HOOK_DESC	modules/gitlab_integration/lib/open_project/gitlab_integration/notification_handler/note_hook.rb	present	payload\.issue\.description	CUSTOM: descriptions scanned for WP references
+PORTFOLIO_LAYOUT	app/helpers/projects_helper.rb	present	def portfolio_management_feature_missing\? = false	New portfolio/program wizard keeps the no_menu layout
+CF_TAB_NO_BANNER	app/views/custom_fields/_tab.html.erb	absent	EnterpriseEdition	No hierarchy banner on the custom fields tab
+SSO_WARNING_KEPT	app/views/admin/settings/authentication_settings/_sso.html.erb	present	password_login_requires_sso_provider	Warning about missing SSO provider kept (no EE guard)
+SSO_NO_BANNER_GUARD	app/views/admin/settings/authentication_settings/_sso.html.erb	absent	with_enterprise_banner_guard	SSO settings not behind the banner guard
+WIKI_LIST_ALWAYS	modules/wikis/app/views/wikis/admin/wiki_providers/index.html.erb	absent	if @wiki_providers\.any\?	Wiki provider list always rendered
+ONBOARDING_TEAM_PLANNER	frontend/src/app/core/setup/globals/onboarding/onboarding_tour.ts	absent	availableFeatures	Onboarding tour does not read the token feature list
+SYNC_UPSTREAM_PATH	custom_scripts/sync_upstream	absent	[^_]script/sync_upstream	Usage text references the real path

@@ -128,3 +128,10 @@ Write self-explanatory code instead of comments.
 - `docs/development/code-review-guidelines/` — Code review standards
 - `CONTRIBUTING.md` — Contribution workflow
 - `.github/copilot-instructions.md` — Extended agent instructions with troubleshooting
+
+## Fork Maintenance (Enterprise features unlocked)
+
+This repository is an internal fork with all Enterprise restrictions removed. When merging an upstream release
+or touching anything related to Enterprise tokens/banners/limits, first read
+`custom_maintenance/AGENT_PLAYBOOK.md` and `custom_maintenance/CUSTOMIZATIONS_REGISTRY.md`
+(human version: `custom_maintenance/HUMAN_GUIDE.md`). Checks: `python3 custom_scripts/enterprise_audit.py verify|scan`.

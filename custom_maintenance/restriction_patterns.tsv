@@ -1,0 +1,23 @@
+# Catalog of ways OpenProject implements Enterprise (EE) restrictions.
+# Columns (TAB separated): id <TAB> regex (Python re, one line) <TAB> description <TAB> recipe (see AGENT_PLAYBOOK.md)
+# Consumed by custom_scripts/enterprise_audit.py. To teach the tooling a NEW pattern, append a row here
+# (see "Learning new patterns" in AGENT_PLAYBOOK.md) and run `enterprise_audit.py scan --update-baseline` after triage.
+ET_CHECK	EnterpriseToken\.(allows_to\?|active\?|trialling\?|trial_only\?|hide_banners\?|available_features|trialling_features|non_trialling_features|user_limit|active_trial_token|one\?|all_tokens)	Direct query of the license token (feature gate)	R2
+ET_REF	\bEnterpriseToken\b	Any reference to the token model (superset of ET_CHECK, catches new usages)	R2
+GUARD_MACRO	guard_enterprise_feature|perform_enterprise_feature_guard|Accounts::EnterpriseGuard	Controller before_action feature guard (macro no longer included in ApplicationController -> NoMethodError at boot)	R1
+BANNER_GUARD	with_enterprise_banner_guard	View helper that renders a banner and only YIELDS when the token allows the feature (silently hides content)	R3
+BANNER_COMP	EnterpriseEdition::(BannerComponent|TrialTeaserComponent|BuyNowButtonComponent|UpsellButtonsComponent)|EnterpriseTrials::	Upsell banner / trial teaser components	R3
+CONTRACT_GUARD	RequiresEnterpriseGuard|enterprise_action|enterprise_condition|EnterpriseGuard|error_enterprise_only	Contract validation based on token (module is neutralized centrally, still check new validators)	R4
+CONTRACT_PLAN	enterprise_plan_required|lowest_plan_for|ee\.upsell\.plan_name	Contract errors that demand a plan	R4
+USER_LIMIT	user_limit|OpenProject::Enterprise\.|enforce_activation_user_limit|enforce_user_limit|show_user_limit|open_seats	User/seat limit enforcement (OpenProject::Enterprise.user_limit is patched to 999999)	R5
+FEATURE_META	enterprise_feature	Menu/tab/custom-field-format/project-module metadata that marks an item as EE (consumers were removed)	R6
+UPSELL_ICON	op-enterprise-addons|upsell-colored|show_enterprise_icon	Enterprise crown icon rendering	R6
+UPSELL_ROUTE	\bupsell\b|share_upsell|_upsell_path	Upsell actions / routes / permissions entries	R1
+HTTP_402	render_402|MissingEnterpriseToken|EnterpriseTokenMissing|missing_ee_token|code_500_missing_enterprise_token|notice_requires_enterprise_token	Hard failure responses for missing token	R1
+SETTING_GATE	writable:\s*->.*(Enterprise|enterprise)|disabled:[^\n]*(Enterprise|enterprise)	Settings made read-only / inputs disabled because of EE	R7
+CAN_FLAGS	can_readonly\?|enterprise_feature_allowed\?|feature_available\?|allowed_by_enterprise_token	Model/helper level feature predicates	R2
+TOKEN_PLAN	OpenProject::Token\b	Direct use of the token gem (plans, features)	R2
+SSO_FILTER	filtered_strategy\?|warn_unavailable	OmniAuth strategy filtering by EE	R2
+FRONTEND_BANNERS	BannersService|bannersService|showBannerFor|allowsTo\(|availableFeatures|triallingFeatures|OpenprojectEnterpriseModule|op-enterprise-banner|enterprise-banner|op-enterprise-addons-icon|showEnterpriseIcon	Angular/TS enterprise gates and banners	R8
+TRIAL_SERVICES	enterprise_trial_creation_host|enterprise_chargebee_site|chargebee|augur	Calls to external trial / billing services	R9
+STATIC_UPSELL_LINKS	upsell_|enterprise_features:|pricing:|enterprise_guide	Static links used only for upsell	R9
