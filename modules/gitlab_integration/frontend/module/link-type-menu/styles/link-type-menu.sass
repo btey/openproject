@@ -1,0 +1,97 @@
+//-- copyright
+// OpenProject is an open source project management software.
+// Copyright (C) 2023 Ben Tey
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License version 3.
+//
+// OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+// Copyright (C) 2006-2013 Jean-Philippe Lang
+// Copyright (C) 2010-2013 the ChiliProject Team
+// Copyright (C) the OpenProject GmbH
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program; if not, write to the Free Software
+// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+//
+// See docs/COPYRIGHT.rdoc for more details.
+//++
+
+.link-type-menu
+  min-width: 200px
+
+  &--items
+    list-style: none
+    margin: 0
+    padding: 0
+
+  &--item
+    margin: 0
+    padding: 0
+    border-bottom: 1px solid var(--color-border-muted)
+
+    &:last-child
+      border-bottom: none
+
+    &_selected
+      background-color: var(--color-accent-subtle)
+
+  &--button
+    width: 100%
+    display: flex
+    align-items: center
+    gap: 0.75rem
+    padding: 0.75rem 1rem
+    background: transparent
+    border: none
+    cursor: pointer
+    text-align: left
+    transition: background-color 0.15s ease
+
+    &:hover
+      background-color: var(--color-canvas-subtle)
+
+    &:active
+      background-color: var(--color-accent-subtle)
+
+  &--icon
+    display: flex
+    align-items: center
+    color: var(--color-fg-muted)
+    flex-shrink: 0
+
+  &--label
+    flex: 1
+    display: flex
+    align-items: center
+    gap: 0.5rem
+    font-size: 0.875rem
+    color: var(--color-fg-default)
+
+  &--default-badge
+    display: inline-block
+    padding: 0.125rem 0.375rem
+    background-color: var(--color-accent-emphasis)
+    color: var(--color-fg-on-emphasis)
+    border-radius: 2rem
+    font-size: 0.75rem
+    font-weight: 500
+    text-transform: uppercase
+    letter-spacing: 0.025em
+
+  &--checkmark
+    display: flex
+    align-items: center
+    color: var(--color-success-emphasis)
+    flex-shrink: 0
+

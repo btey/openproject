@@ -1,0 +1,22 @@
+<%= component_wrapper do %>
+  <%= render(Primer::OpenProject::PageHeader.new) do |header| %>
+    <% header.with_title { t(:label_user_plural) } %>
+    <% header.with_breadcrumbs(breadcrumb_items) %>
+    <% header.with_action_menu(
+         menu_arguments: { anchor_align: :end },
+         button_arguments: {
+           icon: "kebab-horizontal",
+           "aria-label": t(:label_more)
+         }
+       ) do |menu| %>
+      <% menu.with_item(
+           tag: :a,
+           label: t(:"queries.configure_view.heading"),
+           href: configure_view_modal_path,
+           content_arguments: { data: { controller: "async-dialog" }, rel: "nofollow" }
+         ) do |item| %>
+        <% item.with_leading_visual_icon(icon: :gear) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

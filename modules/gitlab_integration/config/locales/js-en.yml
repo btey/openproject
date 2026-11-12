@@ -1,0 +1,85 @@
+#-- copyright
+# OpenProject is an open source project management software.
+# Copyright (C) 2023 Ben Tey
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License version 3.
+#
+# OpenProject is a fork of ChiliProject, which is a fork of Redmine. The copyright follows:
+# Copyright (C) 2006-2013 Jean-Philippe Lang
+# Copyright (C) 2010-2013 the ChiliProject Team
+# Copyright (C) the OpenProject GmbH
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+#
+# See docs/COPYRIGHT.rdoc for more details.
+#++
+
+---
+en:
+  js:
+    label_delete: "Delete"
+    label_unlink: "Unlink"
+    gitlab_integration:
+      gitlab_pipelines: Pipelines
+      tab_header_issue:
+        title: "Issues"
+        create_issue:
+          label: Create Issue
+          description: Create an Issue in GitLab
+          success: "Issue created successfully!"
+          error: "Failed to create Issue: %{error}"
+          loading: "Creating Issue..."
+          toggle_link_type_description: "Toggle between public link (OP#) and private link (PP#)"
+      tab_header_mr:
+        copy_menu:
+          description: Copy git snippets to clipboard
+          label: Git snippets
+        create_mr:
+          description: Create a Merge Request
+          label: Create MR
+          success: "Merge Request created successfully!"
+          error: "Failed to create Merge Request: %{error}"
+          loading: "Creating MR..."
+          toggle_link_type_description: "Toggle between public link (OP#) and private link (PP#)"
+        git_actions:
+          branch_name: Branch name
+          cmd: Create branch with empty commit
+          commit_message: Commit message
+          copy_error: ❌ Copy failed!
+          copy_success: ✅ Copied!
+          title: Quick snippets for Git
+        title: "Merge requests"
+      link_type_menu:
+        public_link: "Public Link"
+        private_link: "Private Link"
+        default_label: "Default"
+      tab_issue:
+        empty: There are no issues linked yet. Link an existing issue by using the code <code>OP#%{wp_id}</code> (or <code>PP#%{wp_id}</code> for private links) in the issue title/description or create a new issue.
+      tab_mrs:
+        empty: There are no merge requests linked yet. Link an existing MR by using the code <code>OP#%{wp_id}</code> (or <code>PP#%{wp_id}</code> for private links) in the MR title/description or create a new MR.
+      updated_on: Updated on
+      confirm_unlink_merge_request: "Are you sure you want to remove the link with the GitLab Merge Request %{number}?"
+      confirm_unlink_issue: "Are you sure you want to remove the link with the GitLab Issue %{number}?"
+      unlink_success: "Link removed successfully"
+      unlink_error: "Failed to remove link"
+      work_packages:
+        tab_name: "GitLab"
+      gitlab_setup:
+        show: "Show GitLab Setup"
+        hide: "Hide GitLab Setup"
+    work_packages:
+      tabs:
+        gitlab: "GitLab"

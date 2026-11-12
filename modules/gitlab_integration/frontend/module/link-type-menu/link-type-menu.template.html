@@ -1,0 +1,28 @@
+<div class="link-type-menu dropdown-relative dropdown">
+  <ul class="link-type-menu--items">
+    @for (item of items; track item.type) {
+      <li class="link-type-menu--item"
+          [ngClass]="{'link-type-menu--item_selected': isSelected(item)}">
+        <button type="button"
+                class="link-type-menu--button"
+                (click)="selectLinkType(item)">
+          <span class="link-type-menu--icon">
+            <op-icon [icon-classes]="'button--icon ' + item.icon" />
+          </span>
+          <span class="link-type-menu--label">
+            {{ item.label }}
+            @if (item.isDefault) {
+              <span class="link-type-menu--default-badge">{{ text.defaultLabel }}</span>
+            }
+          </span>
+          @if (isSelected(item)) {
+            <span class="link-type-menu--checkmark">
+              <op-icon icon-classes="button--icon icon-checkmark" />
+            </span>
+          }
+        </button>
+      </li>
+    }
+  </ul>
+</div>
+

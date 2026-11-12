@@ -1,0 +1,81 @@
+<div class="gitlab-setup-section" *ngIf="canManage">
+  <div class="gitlab-setup-header">
+    <button
+      class="button -alt-highlight"
+      (click)="toggleForm()"
+      [attr.aria-expanded]="showForm"
+      type="button"
+    >
+      <span class="button--text">{{ showForm ? text.hideSetup : text.showSetup }}</span>
+    </button>
+  </div>
+
+  <div class="gitlab-setup-form" *ngIf="showForm">
+    <div class="op-form-section">
+      <div *ngIf="message" [ngClass]="{
+        'notification-box': true,
+        '-success': messageType === 'success',
+        '-error': messageType === 'error'
+      }">
+        {{ message }}
+      </div>
+
+      <div class="op-form-field">
+        <label class="op-form-field--label" for="gitlab-url">
+          GitLab URL
+        </label>
+        <div class="op-form-field--input">
+          <input
+            id="gitlab-url"
+            type="text"
+            class="op-form-field--text"
+            [(ngModel)]="gitlabUrl"
+            placeholder="https://gitlab.com"
+          />
+        </div>
+      </div>
+
+      <div class="op-form-field">
+        <label class="op-form-field--label" for="project-identifier">
+          Project Identifier
+        </label>
+        <div class="op-form-field--input">
+          <input
+            id="project-identifier"
+            type="text"
+            class="op-form-field--text"
+            [(ngModel)]="projectIdentifier"
+            placeholder="username/project-name"
+          />
+        </div>
+      </div>
+
+      <div class="op-form-field">
+        <label class="op-form-field--label" for="access-token">
+          Access Token
+        </label>
+        <div class="op-form-field--input">
+          <input
+            id="access-token"
+            type="password"
+            class="op-form-field--text"
+            [(ngModel)]="accessToken"
+            [placeholder]="accessTokenPlaceholder || 'Enter access token'"
+          />
+        </div>
+      </div>
+
+      <div class="op-form-actions">
+        <button
+          class="button -highlight"
+          (click)="save()"
+          [disabled]="saving"
+          type="button"
+        >
+          <span class="button--text">{{ saving ? 'Saving...' : 'Save' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

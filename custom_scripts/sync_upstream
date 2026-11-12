@@ -1,0 +1,128 @@
+#!/usr/bin/env bash
+#
+# Syncs local customizations with an upstream OpenProject release tag.
+#
+# Our history was created from a one-time source import, so it shares no
+# common ancestor with the real github.com/opf/openproject commit graph.
+# That means `git merge upstream/vX.Y.Z` normally fails with "unrelated
+# histories" and the old workaround (`git diff | git apply --3way`) is a
+# blind patch application: it can't handle renames/context drift and
+# silently fails on many hunks instead of producing real conflicts.
+#
+# This script works around that by temporarily grafting the current branch
+# tip onto the upstream tag it is based on (via `git replace --graft`).
+# That graft is non-destructive and local-only: it never rewrites any
+# existing commit SHA, it only lets Git's history traversal (merge-base,
+# merge, log) treat the two histories as related so a *real* 3-way merge
+# can run. Once the merge is committed, the graft is no longer needed
+# (the merge commit's recorded parent is the original, un-grafted SHA),
+# so we remove it again automatically.
+#
+# The merge is ALWAYS left uncommitted (--no-commit) so you can review
+# and tweak the staged changes before committing, whether or not there
+# were conflicts.
+#
+# Usage:
+#   script/sync_upstream <from_tag> <to_tag> [remote]
+#
+# Example:
+#   script/sync_upstream v17.5.1 v17.6.0
+#   script/sync_upstream v17.5.1 v17.6.0 upstream
+#
+# After the script stops:
+#   1. Resolve any conflicts (look for <<<<<<< markers) and `git add` them
+#   2. Review the full staged diff, tweak anything needed, `git add` again
+#   3. git commit
+#   4. script/sync_upstream --cleanup   # removes the temporary graft
+
+set -euo pipefail
+
+REMOTE="${3:-upstream}"
+GIT_DIR=$(git rev-parse --git-dir)
+STATE_DIR="$GIT_DIR/sync_upstream"
+STATE_FILE="$STATE_DIR/graft_sha"
+
+usage() {
+  echo "Usage: $0 <from_tag> <to_tag> [remote]" >&2
+  echo "       $0 --cleanup" >&2
+  exit 1
+}
+
+cleanup_graft() {
+  if [[ -f "$STATE_FILE" ]]; then
+    local sha
+    sha=$(cat "$STATE_FILE")
+    if git replace -l | grep -qx "$sha"; then
+      git replace -d "$sha"
+      echo "Removed temporary graft for $sha"
+    fi
+    rm -rf "$STATE_DIR"
+  else
+    echo "Nothing to clean up."
+  fi
+}
+
+if [[ "${1:-}" == "--cleanup" ]]; then
+  cleanup_graft
+  exit 0
+fi
+
+if [[ $# -lt 2 ]]; then
+  usage
+fi
+
+FROM_TAG="$1"
+TO_TAG="$2"
+
+if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+  echo "Error: working tree has uncommitted changes. Commit or stash them first." >&2
+  exit 1
+fi
+
+echo "==> Fetching tags from $REMOTE"
+git fetch "$REMOTE" --tags
+
+for tag in "$FROM_TAG" "$TO_TAG"; do
+  if ! git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+    echo "Error: tag '$tag' not found after fetching $REMOTE." >&2
+    exit 1
+  fi
+done
+
+HEAD_SHA=$(git rev-parse HEAD)
+PARENTS=$(git log --format='%P' -1 "$HEAD_SHA")
+
+if [[ -z "$PARENTS" ]]; then
+  echo "Error: HEAD ($HEAD_SHA) has no parents; cannot graft a root commit." >&2
+  exit 1
+fi
+
+echo "==> Grafting $HEAD_SHA onto $FROM_TAG (temporary, local-only)"
+mkdir -p "$STATE_DIR"
+# shellcheck disable=SC2086
+git replace --graft "$HEAD_SHA" $PARENTS "$FROM_TAG"
+echo "$HEAD_SHA" > "$STATE_FILE"
+
+if ! git merge-base HEAD "$FROM_TAG" >/dev/null 2>&1; then
+  echo "Error: graft did not produce a common ancestor with $FROM_TAG." >&2
+  echo "       Your branch may not actually be based on $FROM_TAG's content." >&2
+  cleanup_graft
+  exit 1
+fi
+
+echo "==> Merging $TO_TAG (left uncommitted for review)"
+if git merge --no-commit --no-ff "$TO_TAG"; then
+  echo
+  echo "==> Merge applied cleanly (no conflicts), but NOT committed."
+  echo "    Review the staged changes, tweak if needed, then run:"
+  echo "      git commit -m \"Merge upstream $TO_TAG\""
+  echo "      script/sync_upstream --cleanup"
+else
+  echo
+  echo "==> Merge stopped with conflicts. Resolve them, then run:"
+  echo "      git add <resolved files>"
+  echo "      # review the rest of the staged diff, tweak if needed"
+  echo "      git commit -m \"Merge upstream $TO_TAG\""
+  echo "      script/sync_upstream --cleanup"
+  exit 1
+fi

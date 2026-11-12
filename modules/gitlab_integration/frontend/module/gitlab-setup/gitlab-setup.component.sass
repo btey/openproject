@@ -1,0 +1,64 @@
+.gitlab-setup-section
+  margin-bottom: 0.5rem
+  padding: 0
+  background: transparent
+
+.gitlab-setup-header
+  margin-bottom: 0
+
+.gitlab-setup-form
+  margin-top: 0
+  padding: 1rem
+  background: var(--bgColor-muted, #ffffff)
+  border: 1px solid var(--borderColor-default, #e1e4e8)
+  border-radius: 3px
+
+.op-form-section
+  display: flex
+  flex-direction: column
+  gap: 1rem
+
+.op-form-field
+  display: flex
+  flex-direction: column
+  gap: 0.5rem
+
+.op-form-field--label
+  font-weight: 600
+  color: var(--fgColor-default, #24292f)
+
+.op-form-field--input
+  width: 100%
+
+.op-form-field--text
+  width: 100%
+  padding: 0.5rem
+  border: 1px solid var(--borderColor-default, #d1d5da)
+  border-radius: 3px
+  font-size: 14px
+
+  &:focus
+    outline: none
+    border-color: var(--color-primary-500, #0969da)
+    box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.1)
+
+.op-form-actions
+  display: flex
+  gap: 0.5rem
+  margin-top: 0.5rem
+
+.notification-box
+  padding: 0.75rem 1rem
+  border-radius: 3px
+  margin-bottom: 1rem
+
+  &.-success
+    background-color: var(--bgColor-success-muted, #dafbe1)
+    border: 1px solid var(--borderColor-success-emphasis, #2da44e)
+    color: var(--fgColor-success, #1a7f37)
+
+  &.-error
+    background-color: var(--bgColor-danger-muted, #ffebe9)
+    border: 1px solid var(--borderColor-danger-emphasis, #cf222e)
+    color: var(--fgColor-danger, #cf222e)
+
